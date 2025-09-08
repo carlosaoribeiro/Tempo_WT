@@ -1,13 +1,17 @@
-05_views.md
-Views no Projeto Tempo_WT
+# 05_views.md  
 
-Neste capítulo detalhamos as Views da arquitetura MVVM: os arquivos de layout XML e a MainActivity. Essas camadas são responsáveis por exibir os dados do clima ao usuário, observando as mudanças enviadas pelo ViewModel.
+## Views no Projeto Tempo_WT  
 
-1. activity_main.xml (Layout Principal)
+Neste capítulo detalhamos as **Views** da arquitetura MVVM: os arquivos de layout XML e a `MainActivity`. Essas camadas são responsáveis por exibir os dados do clima ao usuário, observando as mudanças enviadas pelo `ViewModel`.
 
-📂 Arquivo:
-app/src/main/res/layout/activity_main.xml
+---
 
+### 1. `activity_main.xml` (Layout Principal)
+
+📂 Arquivo:  
+`app/src/main/res/layout/activity_main.xml`
+
+```xml
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -150,95 +154,3 @@ app/src/main/res/layout/activity_main.xml
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
 
-
-🔎 Resumo:
-
-Toolbar: exibe título e subtítulo fixos.
-
-TextInputLayout: campo para digitar cidade.
-
-Button: aciona a busca.
-
-CardView: mostra dados do clima.
-
-ProgressIndicator: aparece durante carregamento.
-
-2. MainActivity.kt
-
-📂 Arquivo:
-app/src/main/java/com/carlosribeiro/tempo_wt/ui/MainActivity.kt
-
-class MainActivity : AppCompatActivity() {
-
-    private val viewModel: WeatherViewModel by viewModels()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        // Configuração da Toolbar
-        val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
-        supportActionBar?.title = getString(R.string.tempo_wt)
-        supportActionBar?.subtitle = "Clima agora"
-
-        // Views
-        val etCity = findViewById<TextInputEditText>(R.id.etCity)
-        val btnLoad = findViewById<MaterialButton>(R.id.btnLoad)
-        val ivIcon = findViewById<ImageView>(R.id.ivIcon)
-        val tvCity = findViewById<TextView>(R.id.tvCity)
-        val tvTemp = findViewById<TextView>(R.id.tvTemp)
-        val tvDesc = findViewById<TextView>(R.id.tvDesc)
-        val tvFeels = findViewById<TextView>(R.id.tvFeelsLike)
-        val tvHum  = findViewById<TextView>(R.id.tvHumidity)
-        val tvWind = findViewById<TextView>(R.id.tvWind)
-        val tvUpdated = findViewById<TextView>(R.id.tvUpdated)
-        val progress = findViewById<View>(R.id.progress)
-
-        // Função utilitária para hora
-        fun now(): String = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-
-        // Ação do botão Buscar
-        btnLoad.setOnClickListener {
-            val city = etCity.text?.toString().orEmpty().ifBlank { "Osasco" }
-            progress.visibility = View.VISIBLE
-            viewModel.loadWeather(city)
-        }
-
-        // Observa o ViewModel
-        viewModel.weather.observe(this) { result ->
-            progress.visibility = View.GONE
-            result.onSuccess { response ->
-                tvCity.text = response.name
-                tvTemp.text = "${response.main.temp}°C"
-                tvDesc.text = response.weather.firstOrNull()?.description ?: "-"
-
-                // Ícone via Coil
-                val icon = response.weather.firstOrNull()?.icon
-                if (!icon.isNullOrBlank()) {
-                    val url = "https://openweathermap.org/img/wn/${icon}@4x.png"
-                    ivIcon.load(url)
-                } else ivIcon.setImageDrawable(null)
-
-                // Demais dados
-                tvFeels.text = "Sensação: ${response.main.feels_like}°C"
-                tvHum.text   = "Umidade: ${response.main.humidity}%"
-                tvWind.text  = "Vento: ${response.wind?.speed ?: 0f} m/s"
-                tvUpdated.text = "Atualizado: ${now()}"
-            }.onFailure { e ->
-                tvDesc.text = "Erro: ${e.message}"
-            }
-        }
-    }
-}
-
-
-🔎 Resumo:
-
-Inicializa toolbar, campo de busca, botão e card.
-
-Usa viewModel.loadWeather(cidade) para buscar dados.
-
-Observa LiveData e atualiza a UI em tempo real.
-
-Usa Coil para carregar ícones do clima.
