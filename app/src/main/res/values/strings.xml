@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Tempo_WT</string>
     <string name="temp_c_format">%1$.1f</string>
+    <string name="tempo_wt">Tempo Now</string>
 </resources>

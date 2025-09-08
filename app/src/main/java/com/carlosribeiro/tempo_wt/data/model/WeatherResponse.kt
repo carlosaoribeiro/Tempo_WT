@@ -3,7 +3,8 @@ package com.carlosribeiro.tempo_wt.data.model
 data class WeatherResponse(
     val name: String,
     val main: Main,
-    val weather: List<WeatherInfo>
+    val weather: List<WeatherInfo>,
+    val wind: Wind?            // novo (pode vir null)
 )
 
 data class Main(
@@ -15,4 +16,8 @@ data class Main(
 data class WeatherInfo(
     val description: String,
     val icon: String
+)
+
+data class Wind(
+    val speed: Float
 )
