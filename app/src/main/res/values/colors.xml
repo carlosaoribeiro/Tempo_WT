@@ -1,5 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- cores base da sua identidade -->
+    <color name="brand_purple">#6C49FF</color>
+    <color name="brand_purple_dark">#4E2EE6</color>
+    <color name="brand_on_purple">#FFFFFF</color>
+
+    <color name="brand_secondary">#2962FF</color>
+    <color name="brand_on_secondary">#FFFFFF</color>
+
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#F2F2F2</color>
+    <color name="on_surface">#000000</color>
+
+    <!-- sua cor primária única -->
+    <color name="mdc_theme_primary">#2962FF</color>
+    <color name="mdc_theme_onPrimary">#FFFFFF</color>
+
 </resources>
