@@ -1,2 +1,2 @@
-package ui.view
+package com.carlosribeiro.tempo_wt.ui.view
 
