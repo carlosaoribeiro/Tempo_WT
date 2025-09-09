@@ -2,4 +2,10 @@
     <string name="app_name">Tempo_WT</string>
     <string name="temp_c_format">%1$.1f</string>
     <string name="tempo_wt">Tempo Now</string>
+    <string name="weather_icon" />
+    <string name="uv_index">UV Index: %1$d</string>
+    <string name="updated">Updated: %1$s</string>
+    <string name="visibility">Visibility: %1$d km</string>
+    <string name="location">Location</string>
+
 </resources>
