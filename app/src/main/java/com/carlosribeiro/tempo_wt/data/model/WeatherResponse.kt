@@ -1,23 +1,37 @@
 package com.carlosribeiro.tempo_wt.data.model
 
 data class WeatherResponse(
-    val name: String,
-    val main: Main,
-    val weather: List<WeatherInfo>,
-    val wind: Wind?            // novo (pode vir null)
+    val current: CurrentWeather,
+    val hourly: List<HourlyWeather>,
+    val daily: List<DailyWeather>
 )
 
-data class Main(
-    val temp: Float,
-    val feels_like: Float,
-    val humidity: Int
+data class CurrentWeather(
+    val temp: Double,
+    val feels_like: Double,
+    val humidity: Int,
+    val wind_speed: Double,
+    val weather: List<WeatherDesc>
 )
 
-data class WeatherInfo(
+data class HourlyWeather(
+    val dt: Long,
+    val temp: Double,
+    val weather: List<WeatherDesc>
+)
+
+data class DailyWeather(
+    val dt: Long,
+    val temp: Temp,
+    val weather: List<WeatherDesc>
+)
+
+data class Temp(
+    val min: Double,
+    val max: Double
+)
+
+data class WeatherDesc(
     val description: String,
     val icon: String
-)
-
-data class Wind(
-    val speed: Float
 )

@@ -1,17 +1,19 @@
-package com.carlosaoribeiro.tempo_wt.data.repository
+package com.carlosribeiro.tempo_wt.data.repository
 
+import com.carlosribeiro.tempo_wt.data.model.CurrentWeatherResponse
+import com.carlosribeiro.tempo_wt.data.model.ForecastResponse
+import com.carlosribeiro.tempo_wt.data.remote.NetworkModule
+import com.carlosribeiro.tempo_wt.data.remote.WeatherApiService
 
-import com.carlosribeiro.tempo_wt.data.model.WeatherDomain
-import kotlin.random.Random
+class WeatherRepository(private val apiKey: String) {
 
-class WeatherRepository {
-    fun getWeatherByCity(city: String): WeatherDomain {
-        val temp = Random.nextInt(10, 35) + Random.nextDouble()
-        val desc = listOf("Clear sky", "Cloudy", "Rainy", "Thunderstorm").random()
-        return WeatherDomain(
-            city = city,
-            temperatureC = String.format("%.1f", temp).toDouble(),
-            description = desc
-        )
+    private val api = NetworkModule.create(WeatherApiService::class.java)
+
+    suspend fun getCurrentWeather(city: String): CurrentWeatherResponse {
+        return api.getCurrentWeather(city, apiKey)
+    }
+
+    suspend fun getForecast(city: String): ForecastResponse {
+        return api.getForecast(city, apiKey)
     }
 }
