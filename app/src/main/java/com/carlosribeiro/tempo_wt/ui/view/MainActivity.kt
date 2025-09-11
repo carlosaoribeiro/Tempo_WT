@@ -1,87 +1,132 @@
 package com.carlosribeiro.tempo_wt.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.activity.viewModels
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
-import androidx.core.view.updatePadding
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
-import com.carlosribeiro.tempo_wt.R
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.textfield.TextInputEditText
+import com.carlosribeiro.tempo_wt.data.model.ForecastUiItem
+import com.carlosribeiro.tempo_wt.data.remote.RetrofitInstance
+import com.carlosribeiro.tempo_wt.data.repository.WeatherRepository
+import com.carlosribeiro.tempo_wt.databinding.ActivityMainBinding
+import com.carlosribeiro.tempo_wt.ui.adapter.ForecastAdapter
+import com.carlosribeiro.tempo_wt.ui.viewmodel.WeatherViewModel
+import com.carlosribeiro.tempo_wt.ui.viewmodel.WeatherViewModelFactory
+import com.google.android.material.chip.Chip
 import java.text.SimpleDateFormat
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    private val viewModel: WeatherViewModel by viewModels()
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var viewModel: WeatherViewModel
+    private val forecastAdapter = ForecastAdapter(emptyList())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        // Toolbar
-        val toolbar = findViewById<MaterialToolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayShowTitleEnabled(true)
-        supportActionBar?.title = getString(R.string.tempo_wt)
-        supportActionBar?.subtitle = "Clima agora"
+        binding.rvDaily.setHasFixedSize(true)
+        binding.rvDaily.isNestedScrollingEnabled = false
 
-        // (Edge-to-edge) evita que o título fique sob a status bar
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        ViewCompat.setOnApplyWindowInsetsListener(toolbar) { v, insets ->
-            val top = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.statusBars()).top
-            v.updatePadding(top = top)
-            insets
-        }
+        // VM
+        val api = RetrofitInstance.api
+        val repository = WeatherRepository(api, "bb6ecc2665b7996900f60174b6731200")
+        val factory = WeatherViewModelFactory(repository)
+        viewModel = ViewModelProvider(this, factory)[WeatherViewModel::class.java]
 
-        // Views
-        val etCity = findViewById<TextInputEditText>(R.id.etCity)
-        val btnLoad = findViewById<MaterialButton>(R.id.btnLoad)
-
-        val ivIcon = findViewById<ImageView>(R.id.ivIcon)
-        val tvCity = findViewById<TextView>(R.id.tvCity)
-        val tvTemp = findViewById<TextView>(R.id.tvTemp)
-        val tvDesc = findViewById<TextView>(R.id.tvDesc)
-        val tvFeels = findViewById<TextView>(R.id.tvFeelsLike)
-        val tvHum  = findViewById<TextView>(R.id.tvHumidity)
-        val tvWind = findViewById<TextView>(R.id.tvWind)
-        val tvUpdated = findViewById<TextView>(R.id.tvUpdated)
-        val progress = findViewById<View>(R.id.progress)
+        // Recycler
+        binding.rvDaily.layoutManager = LinearLayoutManager(this)
+        binding.rvDaily.adapter = forecastAdapter
 
         fun now(): String = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
 
-        btnLoad.setOnClickListener {
-            val city = etCity.text?.toString().orEmpty().ifBlank { "Osasco" }
-            progress.visibility = View.VISIBLE
+        // Buscar por cidade digitada
+        binding.etSearch.setOnEditorActionListener { _, _, _ ->
+            val city = binding.etSearch.text?.toString().orEmpty().ifBlank { "Osasco" }
+            binding.progress.visibility = View.VISIBLE
             viewModel.loadWeather(city)
+            true
         }
 
-        viewModel.weather.observe(this) { result ->
-            progress.visibility = View.GONE
+        // Current (NPE-safe)
+        viewModel.current.observe(this) { result ->
+            binding.progress.visibility = View.GONE
             result.onSuccess { response ->
-                tvCity.text = response.name
-                tvTemp.text = "${response.main.temp}°C"
-                tvDesc.text = response.weather.firstOrNull()?.description ?: "-"
+                Log.d("API_CURRENT", "Resposta: $response")
 
-                val icon = response.weather.firstOrNull()?.icon
+                binding.tvCity.text = response.name ?: "-"
+
+                val main = response.main
+                binding.tvTemp.text  = main?.temp?.let { "${it}°C" } ?: "--°C"
+                binding.tvFeelsLike.text = "Sensação: ${main?.feels_like ?: "--"}°C"
+                binding.tvHumidity.text  = "Umidade: ${main?.humidity ?: "--"}%"
+
+                val windSpeed = response.wind?.speed
+                binding.tvWind.text = "Vento: ${windSpeed ?: "--"} m/s"
+
+                val w = response.weather?.firstOrNull()
+                binding.tvDesc.text = w?.description ?: "-"
+
+                val icon = w?.icon
                 if (!icon.isNullOrBlank()) {
-                    val url = "https://openweathermap.org/img/wn/${icon}@4x.png"
-                    ivIcon.load(url)
-                } else ivIcon.setImageDrawable(null)
+                    binding.ivIcon.load("https://openweathermap.org/img/wn/${icon}@4x.png")
+                } else {
+                    binding.ivIcon.setImageDrawable(null)
+                }
 
-                tvFeels.text = "Sensação: ${response.main.feels_like}°C"
-                tvHum.text   = "Umidade: ${response.main.humidity}%"
-                tvWind.text  = "Vento: ${response.wind?.speed ?: 0f} m/s"
-                tvUpdated.text = "Atualizado: ${now()}"
+                binding.tvUpdated.text = "Atualizado: ${now()}"
             }.onFailure { e ->
-                tvDesc.text = "Erro: ${e.message}"
+                Toast.makeText(this, "Erro (current): ${e.message}", Toast.LENGTH_SHORT).show()
+                Log.e("API_CURRENT", "Falha", e)
             }
         }
+
+        // Forecast (NPE-safe)
+        viewModel.forecast.observe(this) { result ->
+            result.onSuccess { forecast ->
+                Log.d("API_FORECAST", "Qtd blocos: ${forecast.list?.size}")
+
+                val uiItems =
+                    (forecast.list ?: emptyList())
+                        .take(7)
+                        .mapNotNull { data ->
+                            val dt = data.dt ?: return@mapNotNull null
+                            val main = data.main
+                            val min = main?.temp_min ?: main?.temp
+                            val max = main?.temp_max ?: main?.temp
+                            val w = data.weather?.firstOrNull()
+                            val desc = w?.description ?: "-"
+                            val icon = w?.icon ?: ""
+                            if (min == null || max == null) return@mapNotNull null
+                            ForecastUiItem(dt, min, max, desc, icon)
+                        }
+
+                binding.rvDaily.adapter = ForecastAdapter(uiItems)
+            }.onFailure { e ->
+                Toast.makeText(this, "Erro forecast: ${e.message}", Toast.LENGTH_SHORT).show()
+                Log.e("API_FORECAST", "Falha", e)
+            }
+        }
+
+        // Chips
+        for (i in 0 until binding.chipGroupCities.childCount) {
+            val chip = binding.chipGroupCities.getChildAt(i) as Chip
+            chip.setOnClickListener {
+                val city = chip.text.toString()
+                binding.progress.visibility = View.VISIBLE
+                viewModel.loadWeather(city)
+            }
+        }
+
+        // Padrão
+        val chipDefault = binding.chipNewYork
+        chipDefault.isChecked = true
+        binding.progress.visibility = View.VISIBLE
+        viewModel.loadWeather(chipDefault.text.toString())
     }
 }

@@ -19,7 +19,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // BuildConfig custom field
-        buildConfigField("String", "OWM_API_KEY", "\"bb6ecc2665b7996900f60174b6731200\"")
+        buildConfigField("String", "WEATHER_API_KEY", "\"bb6ecc2665b7996900f60174b6731200\"")
     }
 
     buildTypes {

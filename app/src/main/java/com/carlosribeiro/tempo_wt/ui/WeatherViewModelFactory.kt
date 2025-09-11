@@ -1,17 +1,17 @@
-package com.carlosribeiro.tempo_wt.ui
+package com.carlosribeiro.tempo_wt.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.carlosribeiro.tempo_wt.data.repository.WeatherRepository
-import com.carlosribeiro.tempo_wt.ui.viewmodel.WeatherViewModel
 
-class WeatherViewModelFactory(private val apiKey: String) : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
+class WeatherViewModelFactory(
+    private val repository: WeatherRepository
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(WeatherViewModel::class.java)) {
-            val repo = WeatherRepository(apiKey) // ✅ passando apiKey
-            return WeatherViewModel(repo) as T
+            @Suppress("UNCHECKED_CAST")
+            return WeatherViewModel(repository) as T
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
+        throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }
 }
