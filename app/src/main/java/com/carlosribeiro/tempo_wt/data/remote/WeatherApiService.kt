@@ -42,6 +42,26 @@ interface WeatherApiService {
         @Query("appid") apiKey: String,
         @Query("limit") limit: Int = 1
     ): List<GeoResponse>
+
+    @GET("data/2.5/weather")
+    suspend fun getCurrentWeatherByCoordinates(
+        @Query("lat") lat: Double,
+        @Query("lon") lon: Double,
+        @Query("appid") apiKey: String,
+        @Query("units") units: String = "metric",
+        @Query("lang") lang: String = "pt_br"
+    ): CurrentWeatherResponse
+
+    @GET("data/2.5/forecast")
+    suspend fun getForecastByCoordinates(
+        @Query("lat") lat: Double,
+        @Query("lon") lon: Double,
+        @Query("appid") apiKey: String,
+        @Query("units") units: String = "metric",
+        @Query("lang") lang: String = "pt_br"
+    ): ForecastResponse
+
+
 }
 
 // 🔹 Modelo auxiliar do Geocoding

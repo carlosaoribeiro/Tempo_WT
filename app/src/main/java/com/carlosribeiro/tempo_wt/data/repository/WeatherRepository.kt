@@ -18,4 +18,13 @@ class WeatherRepository(
     suspend fun getForecast(city: String): ForecastResponse {
         return api.getForecast(city, apiKey)
     }
+
+    suspend fun getCurrentWeatherByCoords(lat: Double, lon: Double): CurrentWeatherResponse {
+        return api.getCurrentWeatherByCoordinates(lat, lon, apiKey)
+    }
+
+    suspend fun getForecastByCoords(lat: Double, lon: Double): ForecastResponse {
+        return api.getForecastByCoordinates(lat, lon, apiKey)
+    }
 }
+

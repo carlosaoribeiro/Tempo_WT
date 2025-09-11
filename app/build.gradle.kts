@@ -76,4 +76,8 @@ dependencies {
     implementation(libs.lifecycle.runtime.ktx)
 
     implementation(libs.coil)
+
+    //Location
+    implementation ("com.google.android.gms:play-services-location:21.0.1")
+
 }

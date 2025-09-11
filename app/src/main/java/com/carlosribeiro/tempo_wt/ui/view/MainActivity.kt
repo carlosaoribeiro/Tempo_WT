@@ -1,10 +1,14 @@
 package com.carlosribeiro.tempo_wt.ui
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
@@ -15,6 +19,8 @@ import com.carlosribeiro.tempo_wt.databinding.ActivityMainBinding
 import com.carlosribeiro.tempo_wt.ui.adapter.ForecastAdapter
 import com.carlosribeiro.tempo_wt.ui.viewmodel.WeatherViewModel
 import com.carlosribeiro.tempo_wt.ui.viewmodel.WeatherViewModelFactory
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.material.chip.Chip
 import java.text.SimpleDateFormat
 import java.util.*
@@ -24,28 +30,33 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: WeatherViewModel
     private val forecastAdapter = ForecastAdapter(emptyList())
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        // 📍 Clique no botão de localização
+        binding.btnLocation.setOnClickListener {
+            checkLocationPermissionAndFetchWeather()
+        }
+
         binding.rvDaily.setHasFixedSize(true)
         binding.rvDaily.isNestedScrollingEnabled = false
 
-        // VM
         val api = RetrofitInstance.api
         val repository = WeatherRepository(api, "bb6ecc2665b7996900f60174b6731200")
         val factory = WeatherViewModelFactory(repository)
         viewModel = ViewModelProvider(this, factory)[WeatherViewModel::class.java]
 
-        // Recycler
         binding.rvDaily.layoutManager = LinearLayoutManager(this)
         binding.rvDaily.adapter = forecastAdapter
 
         fun now(): String = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
 
-        // Buscar por cidade digitada
         binding.etSearch.setOnEditorActionListener { _, _, _ ->
             val city = binding.etSearch.text?.toString().orEmpty().ifBlank { "Osasco" }
             binding.progress.visibility = View.VISIBLE
@@ -53,25 +64,22 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        // Current (NPE-safe)
         viewModel.current.observe(this) { result ->
             binding.progress.visibility = View.GONE
             result.onSuccess { response ->
                 Log.d("API_CURRENT", "Resposta: $response")
 
                 binding.tvCity.text = response.name ?: "-"
-
                 val main = response.main
-                binding.tvTemp.text  = main?.temp?.let { "${it}°C" } ?: "--°C"
+                binding.tvTemp.text = main?.temp?.let { "${it}°C" } ?: "--°C"
                 binding.tvFeelsLike.text = "Sensação: ${main?.feels_like ?: "--"}°C"
-                binding.tvHumidity.text  = "Umidade: ${main?.humidity ?: "--"}%"
+                binding.tvHumidity.text = "Umidade: ${main?.humidity ?: "--"}%"
 
                 val windSpeed = response.wind?.speed
                 binding.tvWind.text = "Vento: ${windSpeed ?: "--"} m/s"
 
                 val w = response.weather?.firstOrNull()
                 binding.tvDesc.text = w?.description ?: "-"
-
                 val icon = w?.icon
                 if (!icon.isNullOrBlank()) {
                     binding.ivIcon.load("https://openweathermap.org/img/wn/${icon}@4x.png")
@@ -86,7 +94,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Forecast (NPE-safe)
         viewModel.forecast.observe(this) { result ->
             result.onSuccess { forecast ->
                 Log.d("API_FORECAST", "Qtd blocos: ${forecast.list?.size}")
@@ -123,10 +130,53 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Padrão
         val chipDefault = binding.chipNewYork
         chipDefault.isChecked = true
         binding.progress.visibility = View.VISIBLE
         viewModel.loadWeather(chipDefault.text.toString())
+    }
+
+    // 📍 Lógica de localização
+    private fun checkLocationPermissionAndFetchWeather() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED) {
+            getUserLocation()
+        } else {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
+        }
+    }
+
+    private fun getUserLocation() {
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location ->
+                if (location != null) {
+                    val lat = location.latitude
+                    val lon = location.longitude
+                    viewModel.loadWeatherByCoordinates(lat, lon) // <== 💡 Crie esse método no seu ViewModel
+                } else {
+                    Toast.makeText(this, "Não foi possível obter a localização.", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE &&
+            grantResults.isNotEmpty() &&
+            grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            getUserLocation()
+        } else {
+            Toast.makeText(this, "Permissão de localização negada.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    companion object {
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 1001
     }
 }
