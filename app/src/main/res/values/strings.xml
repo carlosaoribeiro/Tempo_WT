@@ -2,5 +2,7 @@
     <string name="app_name">Tempo_WT</string>
     <string name="temp_c_format">%1$.1f</string>
     <string name="tempo_wt">Tempo Now</string>
-    <string name="weather_icon" />
+    <!-- Já deve ter outras strings aqui, só adicione essas também -->
+    <string name="location">Localização</string>
+    <string name="weather_icon">Ícone do Clima</string>
 </resources>

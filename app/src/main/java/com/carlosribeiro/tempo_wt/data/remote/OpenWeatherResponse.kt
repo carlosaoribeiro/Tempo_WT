@@ -5,7 +5,6 @@ data class OpenWeatherResponse(
     val name: String?,
     val weather: List<WeatherItem>?,
     val main: Main?,
-    val wind: Wind?
 )
 
 data class WeatherItem(

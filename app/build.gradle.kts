@@ -19,7 +19,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // BuildConfig custom field
-        buildConfigField("String", "OWM_API_KEY", "\"bb6ecc2665b7996900f60174b6731200\"")
+        buildConfigField("String", "WEATHER_API_KEY", "\"bb6ecc2665b7996900f60174b6731200\"")
     }
 
     buildTypes {
@@ -51,8 +51,6 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    implementation ("com.google.android.material:material:1.12.0")
-
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.4")
