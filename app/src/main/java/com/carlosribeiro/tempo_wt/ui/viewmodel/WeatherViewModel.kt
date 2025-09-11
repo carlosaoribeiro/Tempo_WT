@@ -16,6 +16,17 @@ class WeatherViewModel(
     private val _forecast = MutableLiveData<Result<ForecastResponse>>()
     val forecast: LiveData<Result<ForecastResponse>> = _forecast
 
+    fun loadWeatherByCoordinates(lat: Double, lon: Double) {
+        viewModelScope.launch {
+            _current.value = runCatching {
+                repository.getCurrentWeatherByCoords(lat, lon)
+            }
+            _forecast.value = runCatching {
+                repository.getForecastByCoords(lat, lon)
+            }
+        }
+    }
+
     fun loadWeather(city: String) {
         viewModelScope.launch {
             try {
