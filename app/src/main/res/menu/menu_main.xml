@@ -1,14 +1,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/action_toggle_units"
-        android:title="°C"
-        android:icon="@drawable/outline_thermometer_24"
-        app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_refresh"
-        android:title="Atualizar"
-        android:icon="@drawable/outline_refresh_24"
-        app:showAsAction="always" />
+        android:id="@+id/action_location"
+        android:title="Localização"
+        android:icon="@drawable/ic_location"
+        app:showAsAction="always"
+        app:iconTint="@android:color/white" />
 </menu>

@@ -39,7 +39,6 @@ class MainActivity : AppCompatActivity() {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        // 📍 Clique no botão de localização
         binding.btnLocation.setOnClickListener {
             checkLocationPermissionAndFetchWeather()
         }
@@ -64,6 +63,20 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
+        binding.btnTemperatureToggle.setOnClickListener {
+            val current = viewModel.getCurrentUnits()
+            val newUnit = if (current == "metric") {
+                binding.btnTemperatureToggle.text = "F"
+                "imperial"
+            } else {
+                binding.btnTemperatureToggle.text = "C"
+                "metric"
+            }
+
+            viewModel.setCurrentUnits(newUnit)
+            checkLocationPermissionAndFetchWeather() // recarrega com nova unidade
+        }
+
         viewModel.current.observe(this) { result ->
             binding.progress.visibility = View.GONE
             result.onSuccess { response ->
@@ -71,12 +84,13 @@ class MainActivity : AppCompatActivity() {
 
                 binding.tvCity.text = response.name ?: "-"
                 val main = response.main
-                binding.tvTemp.text = main?.temp?.let { "${it}°C" } ?: "--°C"
-                binding.tvFeelsLike.text = "Sensação: ${main?.feels_like ?: "--"}°C"
+                val unitSymbol = if (viewModel.getCurrentUnits() == "metric") "C" else "F"
+                val windUnit = if (viewModel.getCurrentUnits() == "metric") "m/s" else "mph"
+                binding.tvTemp.text = main?.temp?.let { "$it°$unitSymbol" } ?: "--°$unitSymbol"
+                binding.tvFeelsLike.text = "Sensacao: ${main?.feels_like ?: "--"}°$unitSymbol"
                 binding.tvHumidity.text = "Umidade: ${main?.humidity ?: "--"}%"
-
                 val windSpeed = response.wind?.speed
-                binding.tvWind.text = "Vento: ${windSpeed ?: "--"} m/s"
+                binding.tvWind.text = "Vento: ${windSpeed ?: "--"} $windUnit"
 
                 val w = response.weather?.firstOrNull()
                 binding.tvDesc.text = w?.description ?: "-"
@@ -98,20 +112,17 @@ class MainActivity : AppCompatActivity() {
             result.onSuccess { forecast ->
                 Log.d("API_FORECAST", "Qtd blocos: ${forecast.list?.size}")
 
-                val uiItems =
-                    (forecast.list ?: emptyList())
-                        .take(7)
-                        .mapNotNull { data ->
-                            val dt = data.dt ?: return@mapNotNull null
-                            val main = data.main
-                            val min = main?.temp_min ?: main?.temp
-                            val max = main?.temp_max ?: main?.temp
-                            val w = data.weather?.firstOrNull()
-                            val desc = w?.description ?: "-"
-                            val icon = w?.icon ?: ""
-                            if (min == null || max == null) return@mapNotNull null
-                            ForecastUiItem(dt, min, max, desc, icon)
-                        }
+                val uiItems = (forecast.list ?: emptyList()).take(7).mapNotNull { data ->
+                    val dt = data.dt ?: return@mapNotNull null
+                    val main = data.main
+                    val min = main?.temp_min ?: main?.temp
+                    val max = main?.temp_max ?: main?.temp
+                    val w = data.weather?.firstOrNull()
+                    val desc = w?.description ?: "-"
+                    val icon = w?.icon ?: ""
+                    if (min == null || max == null) return@mapNotNull null
+                    ForecastUiItem(dt, min, max, desc, icon)
+                }
 
                 binding.rvDaily.adapter = ForecastAdapter(uiItems)
             }.onFailure { e ->
@@ -120,7 +131,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Chips
         for (i in 0 until binding.chipGroupCities.childCount) {
             val chip = binding.chipGroupCities.getChildAt(i) as Chip
             chip.setOnClickListener {
@@ -136,10 +146,10 @@ class MainActivity : AppCompatActivity() {
         viewModel.loadWeather(chipDefault.text.toString())
     }
 
-    // 📍 Lógica de localização
     private fun checkLocationPermissionAndFetchWeather() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-            == PackageManager.PERMISSION_GRANTED) {
+            == PackageManager.PERMISSION_GRANTED
+        ) {
             getUserLocation()
         } else {
             ActivityCompat.requestPermissions(
@@ -151,16 +161,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getUserLocation() {
-        fusedLocationClient.lastLocation
-            .addOnSuccessListener { location ->
-                if (location != null) {
-                    val lat = location.latitude
-                    val lon = location.longitude
-                    viewModel.loadWeatherByCoordinates(lat, lon) // <== 💡 Crie esse método no seu ViewModel
-                } else {
-                    Toast.makeText(this, "Não foi possível obter a localização.", Toast.LENGTH_SHORT).show()
-                }
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            if (location != null) {
+                val lat = location.latitude
+                val lon = location.longitude
+                viewModel.loadWeatherByCoordinates(lat, lon)
+            } else {
+                Toast.makeText(this, "Não foi possível obter a localização.", Toast.LENGTH_SHORT).show()
             }
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -169,7 +178,8 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE &&
             grantResults.isNotEmpty() &&
-            grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            grantResults[0] == PackageManager.PERMISSION_GRANTED
+        ) {
             getUserLocation()
         } else {
             Toast.makeText(this, "Permissão de localização negada.", Toast.LENGTH_SHORT).show()
