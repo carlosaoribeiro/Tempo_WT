@@ -9,22 +9,19 @@ class WeatherRepository(
     private val apiKey: String
 ) {
 
-    // Clima atual por cidade
-    suspend fun getCurrentWeather(city: String): CurrentWeatherResponse {
-        return api.getCurrentWeather(city, apiKey)
+    suspend fun getCurrentWeather(city: String, units: String): CurrentWeatherResponse {
+        return api.getCurrentWeather(city, apiKey, units)
     }
 
-    // Previsão 5 dias (3h em 3h)
-    suspend fun getForecast(city: String): ForecastResponse {
-        return api.getForecast(city, apiKey)
+    suspend fun getForecast(city: String, units: String): ForecastResponse {
+        return api.getForecast(city, apiKey, units)
     }
 
-    suspend fun getCurrentWeatherByCoords(lat: Double, lon: Double): CurrentWeatherResponse {
-        return api.getCurrentWeatherByCoordinates(lat, lon, apiKey)
+    suspend fun getCurrentWeatherByCoords(lat: Double, lon: Double, units: String): CurrentWeatherResponse {
+        return api.getCurrentWeatherByCoordinates(lat, lon, apiKey, units)
     }
 
-    suspend fun getForecastByCoords(lat: Double, lon: Double): ForecastResponse {
-        return api.getForecastByCoordinates(lat, lon, apiKey)
+    suspend fun getForecastByCoords(lat: Double, lon: Double, units: String): ForecastResponse {
+        return api.getForecastByCoordinates(lat, lon, apiKey, units)
     }
 }
-

@@ -19,4 +19,7 @@
     <color name="mdc_theme_primary">#2962FF</color>
     <color name="mdc_theme_onPrimary">#FFFFFF</color>
 
+    <color name="gray_200">#EEEEEE</color>
+
+
 </resources>
