@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    android:background="@drawable/bg_weather_card"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Localização -->
+        <TextView
+            android:id="@+id/tvCity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="San Francisco, CA"
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
+
+        <!-- Temperatura -->
+        <TextView
+            android:id="@+id/tvTemp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="68°"
+            android:textColor="@android:color/white"
+            android:textSize="48sp"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp" />
+
+        <!-- Descrição -->
+        <TextView
+            android:id="@+id/tvDesc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Partly Cloudy"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <!-- Feels like -->
+        <TextView
+            android:id="@+id/tvFeelsLike"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Feels like 70°"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp" />
+
+        <!-- Min / Max -->
+        <TextView
+            android:id="@+id/tvMinMax"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="H:72° L:58°"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp" />
+
+        <!-- Ícone do tempo -->
+        <ImageView
+            android:id="@+id/ivIcon"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_gravity="end"
+            android:src="@drawable/ic_cloud"
+            android:tint="@android:color/white"
+            android:contentDescription="Weather icon" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

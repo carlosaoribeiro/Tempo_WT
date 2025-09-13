@@ -16,12 +16,12 @@ import com.carlosribeiro.tempo_wt.data.model.ForecastUiItem
 import com.carlosribeiro.tempo_wt.data.remote.RetrofitInstance
 import com.carlosribeiro.tempo_wt.data.repository.WeatherRepository
 import com.carlosribeiro.tempo_wt.databinding.ActivityMainBinding
-import com.carlosribeiro.tempo_wt.ui.adapter.ForecastAdapter
+import com.carlosribeiro.tempo_wt.ui.adapter.DailyForecastAdapter
+import com.carlosribeiro.tempo_wt.ui.adapter.HourlyForecastAdapter
 import com.carlosribeiro.tempo_wt.ui.viewmodel.WeatherViewModel
 import com.carlosribeiro.tempo_wt.ui.viewmodel.WeatherViewModelFactory
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.material.chip.Chip
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -29,7 +29,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: WeatherViewModel
-    private val forecastAdapter = ForecastAdapter(emptyList())
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,23 +38,27 @@ class MainActivity : AppCompatActivity() {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
+        // 📍 Botão de localização
         binding.btnLocation.setOnClickListener {
             checkLocationPermissionAndFetchWeather()
         }
 
-        binding.rvDaily.setHasFixedSize(true)
-        binding.rvDaily.isNestedScrollingEnabled = false
+        // 🔄 Configuração dos RecyclerViews
+        binding.rvHourly.layoutManager = LinearLayoutManager(
+            this,
+            LinearLayoutManager.HORIZONTAL,
+            false
+        )
+        binding.rvDaily.layoutManager = LinearLayoutManager(this)
 
         val api = RetrofitInstance.api
         val repository = WeatherRepository(api, "bb6ecc2665b7996900f60174b6731200")
         val factory = WeatherViewModelFactory(repository)
         viewModel = ViewModelProvider(this, factory)[WeatherViewModel::class.java]
 
-        binding.rvDaily.layoutManager = LinearLayoutManager(this)
-        binding.rvDaily.adapter = forecastAdapter
-
         fun now(): String = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
 
+        // 🔎 Busca por cidade
         binding.etSearch.setOnEditorActionListener { _, _, _ ->
             val city = binding.etSearch.text?.toString().orEmpty().ifBlank { "Osasco" }
             binding.progress.visibility = View.VISIBLE
@@ -63,6 +66,7 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
+        // 🌡️ Toggle de temperatura
         binding.btnTemperatureToggle.setOnClickListener {
             val current = viewModel.getCurrentUnits()
             val newUnit = if (current == "metric") {
@@ -72,11 +76,11 @@ class MainActivity : AppCompatActivity() {
                 binding.btnTemperatureToggle.text = "C"
                 "metric"
             }
-
             viewModel.setCurrentUnits(newUnit)
-            checkLocationPermissionAndFetchWeather() // recarrega com nova unidade
+            checkLocationPermissionAndFetchWeather()
         }
 
+        // 🔄 Observa clima atual
         viewModel.current.observe(this) { result ->
             binding.progress.visibility = View.GONE
             result.onSuccess { response ->
@@ -86,11 +90,11 @@ class MainActivity : AppCompatActivity() {
                 val main = response.main
                 val unitSymbol = if (viewModel.getCurrentUnits() == "metric") "C" else "F"
                 val windUnit = if (viewModel.getCurrentUnits() == "metric") "m/s" else "mph"
+
                 binding.tvTemp.text = main?.temp?.let { "$it°$unitSymbol" } ?: "--°$unitSymbol"
-                binding.tvFeelsLike.text = "Sensacao: ${main?.feels_like ?: "--"}°$unitSymbol"
+                binding.tvFeelsLike.text = "Sensação: ${main?.feels_like ?: "--"}°$unitSymbol"
                 binding.tvHumidity.text = "Umidade: ${main?.humidity ?: "--"}%"
-                val windSpeed = response.wind?.speed
-                binding.tvWind.text = "Vento: ${windSpeed ?: "--"} $windUnit"
+                binding.tvWind.text = "Vento: ${response.wind?.speed ?: "--"} $windUnit"
 
                 val w = response.weather?.firstOrNull()
                 binding.tvDesc.text = w?.description ?: "-"
@@ -108,42 +112,45 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        // 🔄 Observa previsão (horária e diária)
         viewModel.forecast.observe(this) { result ->
             result.onSuccess { forecast ->
                 Log.d("API_FORECAST", "Qtd blocos: ${forecast.list?.size}")
+                val forecastList = forecast.list ?: emptyList()
 
-                val uiItems = (forecast.list ?: emptyList()).take(7).mapNotNull { data ->
-                    val dt = data.dt ?: return@mapNotNull null
-                    val main = data.main
-                    val min = main?.temp_min ?: main?.temp
-                    val max = main?.temp_max ?: main?.temp
-                    val w = data.weather?.firstOrNull()
-                    val desc = w?.description ?: "-"
-                    val icon = w?.icon ?: ""
-                    if (min == null || max == null) return@mapNotNull null
-                    ForecastUiItem(dt, min, max, desc, icon)
-                }
+                // Próximas 12 horas
+                val hourlyItems = forecastList
+                    .take(12)
+                    .mapNotNull { data ->
+                        val dt = data.dt ?: return@mapNotNull null
+                        val temp = data.main?.temp ?: return@mapNotNull null
+                        val w = data.weather?.firstOrNull()
+                        ForecastUiItem(dt, temp, temp, w?.description ?: "-", w?.icon ?: "")
+                    }
+                binding.rvHourly.adapter = HourlyForecastAdapter(hourlyItems)
 
-                binding.rvDaily.adapter = ForecastAdapter(uiItems)
+                // Previsão diária (7 dias)
+                val dailyItems = forecastList
+                    .filterIndexed { index, _ -> index % 8 == 0 } // 1 ponto por dia
+                    .take(7)
+                    .mapNotNull { data ->
+                        val dt = data.dt ?: return@mapNotNull null
+                        val main = data.main
+                        val min = main?.temp_min ?: main?.temp
+                        val max = main?.temp_max ?: main?.temp
+                        val w = data.weather?.firstOrNull()
+                        ForecastUiItem(dt, min ?: 0.0, max ?: 0.0, w?.description ?: "-", w?.icon ?: "")
+                    }
+                binding.rvDaily.adapter = DailyForecastAdapter(dailyItems)
+
             }.onFailure { e ->
                 Toast.makeText(this, "Erro forecast: ${e.message}", Toast.LENGTH_SHORT).show()
                 Log.e("API_FORECAST", "Falha", e)
             }
         }
 
-        for (i in 0 until binding.chipGroupCities.childCount) {
-            val chip = binding.chipGroupCities.getChildAt(i) as Chip
-            chip.setOnClickListener {
-                val city = chip.text.toString()
-                binding.progress.visibility = View.VISIBLE
-                viewModel.loadWeather(city)
-            }
-        }
-
-        val chipDefault = binding.chipNewYork
-        chipDefault.isChecked = true
-        binding.progress.visibility = View.VISIBLE
-        viewModel.loadWeather(chipDefault.text.toString())
+        // 🌍 Inicializa com localização atual
+        checkLocationPermissionAndFetchWeather()
     }
 
     private fun checkLocationPermissionAndFetchWeather() {

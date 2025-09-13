@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:gravity="center_vertical">
+
+    <!-- Dia da semana -->
+    <TextView
+        android:id="@+id/tvDay"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:text="Mon"
+        android:textSize="14sp"
+        android:textColor="@android:color/black" />
+
+    <!-- Ícone do clima -->
+    <ImageView
+        android:id="@+id/ivIcon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="8dp"
+        android:contentDescription="@string/app_name" />
+
+    <!-- Descrição -->
+    <TextView
+        android:id="@+id/tvDesc"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_weight="1"
+        android:text="Cloudy"
+        android:textSize="14sp"
+        android:textColor="@android:color/black" />
+
+    <!-- % de chuva -->
+    <TextView
+        android:id="@+id/tvRain"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:text="20%"
+        android:textSize="14sp"
+        android:textColor="@android:color/holo_blue_dark"
+        android:gravity="end" />
+
+    <!-- Máxima -->
+    <TextView
+        android:id="@+id/tvTempMax"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:text="72°"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:gravity="end" />
+
+    <!-- Mínima -->
+    <TextView
+        android:id="@+id/tvTempMin"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:text="55°"
+        android:textColor="@android:color/darker_gray"
+        android:gravity="end" />
+
+</LinearLayout>
