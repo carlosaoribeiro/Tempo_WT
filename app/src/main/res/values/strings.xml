@@ -7,4 +7,13 @@
     <string name="weather_icon">Ícone do Clima</string>
     <string name="hourly_forecast">Hourly Forecast</string>
     <string name="daily_forecast">Daily Forecast</string>
+    <string name="weather_details">Weather Details</string>
+    <string name="humidity">Humidity</string>
+    <string name="wind">Wind</string>
+    <string name="visibility">Visibility</string>
+    <string name="pressure">Pressure</string>
+    <string name="uv_index">UV Index</string>
+    <string name="sunrise">Sunrise</string>
+    <string name="sunset">Sunset</string>
+
 </resources>
