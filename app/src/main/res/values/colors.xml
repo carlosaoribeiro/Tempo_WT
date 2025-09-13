@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- cores base da sua identidade -->
-    <color name="brand_purple">#6C49FF</color>
+    <color name="brand_purple">#F3F3F6</color>
     <color name="brand_purple_dark">#4E2EE6</color>
-    <color name="brand_on_purple">#FFFFFF</color>
+    <color name="brand_on_purple">#FFFFFFFF</color>
 
     <color name="brand_secondary">#2962FF</color>
     <color name="brand_on_secondary">#FFFFFF</color>

@@ -5,4 +5,6 @@
     <!-- Já deve ter outras strings aqui, só adicione essas também -->
     <string name="location">Localização</string>
     <string name="weather_icon">Ícone do Clima</string>
+    <string name="hourly_forecast">Hourly Forecast</string>
+    <string name="daily_forecast">Daily Forecast</string>
 </resources>
