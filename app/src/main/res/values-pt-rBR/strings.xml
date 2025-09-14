@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">Tempo_WT</string>
+    <string name="tempo_wt">Tempo Agora</string>
+
+    <!-- Labels -->
+    <string name="location">Localização</string>
+    <string name="weather_icon">Ícone do Clima</string>
+    <string name="hourly_forecast">Previsão por Hora</string>
+    <string name="daily_forecast">Previsão Diária</string>
+    <string name="weather_details">Detalhes do Clima</string>
+    <string name="hourly_weather_icon">Ícone da previsão por hora</string>
+
+
+    <!-- Details -->
+    <string name="humidity">Umidade</string>
+    <string name="wind">Vento</string>
+    <string name="visibility">Visibilidade</string>
+    <string name="pressure">Pressão</string>
+    <string name="uv_index">Índice UV</string>
+    <string name="sunrise">Nascer do Sol</string>
+    <string name="sunset">Pôr do Sol</string>
+    <string name="updated">Atualizado</string>
+
+    <!-- Weather conditions -->
+    <string name="clear_sky">Céu limpo</string>
+    <string name="few_clouds">Poucas nuvens</string>
+    <string name="scattered_clouds">Nuvens dispersas</string>
+    <string name="broken_clouds">Nuvens quebradas</string>
+    <string name="shower_rain">Chuva rápida</string>
+    <string name="rain">Chuva</string>
+    <string name="thunderstorm">Trovoada</string>
+    <string name="snow">Neve</string>
+    <string name="mist">Névoa</string>
+</resources>

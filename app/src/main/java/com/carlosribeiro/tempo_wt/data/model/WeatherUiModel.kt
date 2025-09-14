@@ -1,5 +1,7 @@
 package com.carlosribeiro.tempo_wt.data.model
 
+import com.carlosribeiro.tempo_wt.ui.model.ForecastUiItem
+
 data class WeatherUiModel(
     val city: String,
     val description: String,

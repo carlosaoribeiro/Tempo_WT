@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="72dp"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="8dp">
+    android:padding="8dp"
+    android:background="@drawable/bg_hourly_item">
 
+    <!-- Hora -->
     <TextView
         android:id="@+id/tvHour"
         android:layout_width="wrap_content"
@@ -15,13 +17,16 @@
         android:textSize="14sp"
         android:textStyle="bold" />
 
+    <!-- Ícone -->
     <ImageView
         android:id="@+id/ivIconHour"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginTop="4dp"
+        android:contentDescription="@string/hourly_weather_icon"
         android:src="@drawable/ic_weather_placeholder" />
 
+    <!-- Temperatura -->
     <TextView
         android:id="@+id/tvTempHour"
         android:layout_width="wrap_content"
@@ -29,6 +34,17 @@
         android:text="22°C"
         android:textColor="@android:color/black"
         android:textSize="14sp"
-        android:layout_marginTop="4dp" />
+        android:layout_marginTop="4dp"
+        android:textStyle="bold" />
+
+    <!-- % Chuva -->
+    <TextView
+        android:id="@+id/tvRainChance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="20%"
+        android:textColor="@android:color/holo_blue_dark"
+        android:textSize="12sp"
+        android:layout_marginTop="2dp" />
 
 </LinearLayout>

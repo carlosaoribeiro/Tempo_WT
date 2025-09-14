@@ -8,7 +8,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.carlosribeiro.tempo_wt.R
-import com.carlosribeiro.tempo_wt.data.model.ForecastUiItem
+
+import com.carlosribeiro.tempo_wt.ui.model.ForecastUiItem
 import java.text.SimpleDateFormat
 import java.util.*
 

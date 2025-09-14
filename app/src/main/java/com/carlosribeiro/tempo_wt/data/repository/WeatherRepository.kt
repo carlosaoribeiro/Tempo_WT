@@ -1,7 +1,8 @@
 package com.carlosribeiro.tempo_wt.data.repository
 
-import com.carlosribeiro.tempo_wt.data.model.CurrentWeatherResponse
-import com.carlosribeiro.tempo_wt.data.model.ForecastResponse
+
+import com.carlosribeiro.tempo_wt.data.model.current.CurrentWeatherResponse
+import com.carlosribeiro.tempo_wt.data.model.forecast.ForecastResponse
 import com.carlosribeiro.tempo_wt.data.remote.WeatherApiService
 
 class WeatherRepository(

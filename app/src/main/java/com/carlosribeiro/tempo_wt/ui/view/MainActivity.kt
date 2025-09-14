@@ -12,7 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
-import com.carlosribeiro.tempo_wt.data.model.ForecastUiItem
+import com.carlosribeiro.tempo_wt.ui.model.ForecastUiItem
 import com.carlosribeiro.tempo_wt.data.remote.RetrofitInstance
 import com.carlosribeiro.tempo_wt.data.repository.WeatherRepository
 import com.carlosribeiro.tempo_wt.databinding.ActivityMainBinding
@@ -83,19 +83,20 @@ class MainActivity : AppCompatActivity() {
         // 🔄 Observa clima atual
         viewModel.current.observe(this) { result ->
             binding.progress.visibility = View.GONE
-            result.onSuccess { response ->
-                Log.d("API_CURRENT", "Resposta: $response")
 
+            result.onSuccess { response ->
                 binding.tvCity.text = response.name ?: "-"
                 val main = response.main
                 val unitSymbol = if (viewModel.getCurrentUnits() == "metric") "C" else "F"
                 val windUnit = if (viewModel.getCurrentUnits() == "metric") "m/s" else "mph"
 
+                // 🌡️ Clima principal
                 binding.tvTemp.text = main?.temp?.let { "$it°$unitSymbol" } ?: "--°$unitSymbol"
                 binding.tvFeelsLike.text = "Sensação: ${main?.feels_like ?: "--"}°$unitSymbol"
                 binding.tvHumidity.text = "Umidade: ${main?.humidity ?: "--"}%"
                 binding.tvWind.text = "Vento: ${response.wind?.speed ?: "--"} $windUnit"
 
+                // 🌤️ Descrição + ícone
                 val w = response.weather?.firstOrNull()
                 binding.tvDesc.text = w?.description ?: "-"
                 val icon = w?.icon
@@ -105,8 +106,35 @@ class MainActivity : AppCompatActivity() {
                     binding.ivIcon.setImageDrawable(null)
                 }
 
-                binding.tvUpdated.text = "Atualizado: ${now()}"
-            }.onFailure { e ->
+                // 🌍 Weather Details Card
+                binding.tvHumidityDetail.text = "${main?.humidity ?: "--"}%"
+
+                // 🌬️ Vento (com direção)
+                val windSpeed = response.wind?.speed ?: 0.0
+                val windDir = response.wind?.deg?.let { deg -> getWindDirection(deg) } ?: ""
+                binding.tvWindDetail.text = "$windSpeed $windUnit $windDir"
+
+                // 👁️ Visibilidade
+                val visibilityMeters = response.visibility ?: 0
+                val visibilityText = if (viewModel.getCurrentUnits() == "metric") {
+                    "${visibilityMeters / 1000} km"
+                } else {
+                    String.format(Locale.getDefault(), "%.1f mi", visibilityMeters / 1609.34)
+                }
+                binding.tvVisibility.text = visibilityText
+
+                // 🌡️ Pressão
+                binding.tvPressure.text = "${main?.pressure ?: "--"} hPa"
+
+                // ☀️ Nascer/pôr do sol
+                val sdf = SimpleDateFormat("h:mm a", Locale.getDefault())
+                val sunrise = response.sys?.sunrise?.let { ts -> sdf.format(Date(ts * 1000L)) } ?: "--:--"
+                val sunset = response.sys?.sunset?.let { ts -> sdf.format(Date(ts * 1000L)) } ?: "--:--"
+                binding.tvSunrise.text = sunrise
+                binding.tvSunset.text = sunset
+            }
+
+            result.onFailure { e ->
                 Toast.makeText(this, "Erro (current): ${e.message}", Toast.LENGTH_SHORT).show()
                 Log.e("API_CURRENT", "Falha", e)
             }
@@ -118,32 +146,43 @@ class MainActivity : AppCompatActivity() {
                 Log.d("API_FORECAST", "Qtd blocos: ${forecast.list?.size}")
                 val forecastList = forecast.list ?: emptyList()
 
-                // Próximas 12 horas
+                // ⏱️ Próximas 12h
                 val hourlyItems = forecastList
                     .take(12)
-                    .mapNotNull { data ->
-                        val dt = data.dt ?: return@mapNotNull null
-                        val temp = data.main?.temp ?: return@mapNotNull null
-                        val w = data.weather?.firstOrNull()
-                        ForecastUiItem(dt, temp, temp, w?.description ?: "-", w?.icon ?: "")
+                    .map { data ->
+                        val w = data.weather.firstOrNull()
+                        ForecastUiItem(
+                            date = data.dt,
+                            minTemp = data.main.temp ?: 0.0,
+                            maxTemp = data.main.temp ?: 0.0,
+                            description = w?.description ?: "-",
+                            icon = w?.icon ?: "",
+                            rain = (data.pop?.times(100))?.toInt()
+                        )
                     }
                 binding.rvHourly.adapter = HourlyForecastAdapter(hourlyItems)
 
-                // Previsão diária (7 dias)
+                // 📅 Previsão diária (7 dias)
                 val dailyItems = forecastList
-                    .filterIndexed { index, _ -> index % 8 == 0 } // 1 ponto por dia
+                    .filterIndexed { index, _ -> index % 8 == 0 }
                     .take(7)
-                    .mapNotNull { data ->
-                        val dt = data.dt ?: return@mapNotNull null
-                        val main = data.main
-                        val min = main?.temp_min ?: main?.temp
-                        val max = main?.temp_max ?: main?.temp
-                        val w = data.weather?.firstOrNull()
-                        ForecastUiItem(dt, min ?: 0.0, max ?: 0.0, w?.description ?: "-", w?.icon ?: "")
+                    .map { data ->
+                        val min = data.main.temp_min ?: data.main.temp
+                        val max = data.main.temp_max ?: data.main.temp
+                        val w = data.weather.firstOrNull()
+                        ForecastUiItem(
+                            date = data.dt,
+                            minTemp = min ?: 0.0,
+                            maxTemp = max ?: 0.0,
+                            description = w?.description ?: "-",
+                            icon = w?.icon ?: "",
+                            rain = (data.pop?.times(100))?.toInt()
+                        )
                     }
                 binding.rvDaily.adapter = DailyForecastAdapter(dailyItems)
+            }
 
-            }.onFailure { e ->
+            result.onFailure { e ->
                 Toast.makeText(this, "Erro forecast: ${e.message}", Toast.LENGTH_SHORT).show()
                 Log.e("API_FORECAST", "Falha", e)
             }
@@ -195,5 +234,19 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1001
+    }
+
+    // Função auxiliar para direção do vento
+    private fun getWindDirection(deg: Int): String {
+        return when (deg) {
+            in 23..67 -> "NE"
+            in 68..112 -> "E"
+            in 113..157 -> "SE"
+            in 158..202 -> "S"
+            in 203..247 -> "SW"
+            in 248..292 -> "W"
+            in 293..337 -> "NW"
+            else -> "N"
+        }
     }
 }

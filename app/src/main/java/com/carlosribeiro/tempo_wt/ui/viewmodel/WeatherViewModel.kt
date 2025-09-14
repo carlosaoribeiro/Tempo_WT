@@ -1,8 +1,8 @@
 package com.carlosribeiro.tempo_wt.ui.viewmodel
 
 import androidx.lifecycle.*
-import com.carlosribeiro.tempo_wt.data.model.CurrentWeatherResponse
-import com.carlosribeiro.tempo_wt.data.model.ForecastResponse
+import com.carlosribeiro.tempo_wt.data.model.current.CurrentWeatherResponse
+import com.carlosribeiro.tempo_wt.data.model.forecast.ForecastResponse
 import com.carlosribeiro.tempo_wt.data.repository.WeatherRepository
 import kotlinx.coroutines.launch
 

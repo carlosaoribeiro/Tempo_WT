@@ -1,13 +1,17 @@
 <resources>
     <string name="app_name">Tempo_WT</string>
-    <string name="temp_c_format">%1$.1f</string>
-    <string name="tempo_wt">Tempo Now</string>
-    <!-- Já deve ter outras strings aqui, só adicione essas também -->
-    <string name="location">Localização</string>
-    <string name="weather_icon">Ícone do Clima</string>
+    <string name="tempo_wt">Weather Now</string>
+
+    <!-- Labels -->
+    <string name="location">Location</string>
+    <string name="weather_icon">Weather Icon</string>
     <string name="hourly_forecast">Hourly Forecast</string>
     <string name="daily_forecast">Daily Forecast</string>
     <string name="weather_details">Weather Details</string>
+    <string name="hourly_weather_icon">Hourly weather icon</string>
+
+
+    <!-- Details -->
     <string name="humidity">Humidity</string>
     <string name="wind">Wind</string>
     <string name="visibility">Visibility</string>
@@ -15,5 +19,16 @@
     <string name="uv_index">UV Index</string>
     <string name="sunrise">Sunrise</string>
     <string name="sunset">Sunset</string>
+    <string name="updated">Updated</string>
 
+    <!-- Weather conditions -->
+    <string name="clear_sky">Clear sky</string>
+    <string name="few_clouds">Few clouds</string>
+    <string name="scattered_clouds">Scattered clouds</string>
+    <string name="broken_clouds">Broken clouds</string>
+    <string name="shower_rain">Shower rain</string>
+    <string name="rain">Rain</string>
+    <string name="thunderstorm">Thunderstorm</string>
+    <string name="snow">Snow</string>
+    <string name="mist">Mist</string>
 </resources>
