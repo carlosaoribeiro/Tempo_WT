@@ -36,6 +36,17 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Clique na lupa do campo de busca
+        binding.searchInputLayout.setEndIconOnClickListener {
+            val city = binding.etSearch.text?.toString().orEmpty()
+            if (city.isNotBlank()) {
+                binding.progress.visibility = View.VISIBLE
+                viewModel.loadWeather(city)
+            } else {
+                Toast.makeText(this, "Please enter a city", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         // 📍 Botão de localização

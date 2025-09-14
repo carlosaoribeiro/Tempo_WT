@@ -9,6 +9,7 @@
     <string name="daily_forecast">Daily Forecast</string>
     <string name="weather_details">Weather Details</string>
     <string name="hourly_weather_icon">Hourly weather icon</string>
+    <string name="search_city">Search for a city...</string>
 
 
     <!-- Details -->
