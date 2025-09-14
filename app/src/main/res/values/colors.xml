@@ -21,5 +21,12 @@
 
     <color name="gray_200">#EEEEEE</color>
 
+    <color name="gray_500">#9E9E9E</color> <!-- Material Gray 500 -->
+    <color name="darker_gray">#757575</color> <!-- Material Gray 600 -->
+
+    <color name="gray_50">#FAFAFA</color>
+
+    <color name="blue_500">#2196F3</color>
+
 
 </resources>

@@ -9,6 +9,7 @@
     <string name="daily_forecast">Previsão Diária</string>
     <string name="weather_details">Detalhes do Clima</string>
     <string name="hourly_weather_icon">Ícone da previsão por hora</string>
+    <string name="search_city">Search for a city...</string>
 
 
     <!-- Details -->

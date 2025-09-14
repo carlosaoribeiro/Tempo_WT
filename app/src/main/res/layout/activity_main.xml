@@ -5,8 +5,8 @@
     android:id="@+id/scrollMain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:background="@android:color/white">
+    android:background="@android:color/white"
+    android:fillViewport="true">
 
     <LinearLayout
         android:id="@+id/mainLayout"
@@ -52,18 +52,18 @@
                 android:layout_height="40dp"
                 android:layout_marginEnd="8dp"
                 android:backgroundTint="@color/gray_200"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:padding="0dp"
                 android:text="C"
                 android:textColor="@android:color/black"
-                android:textStyle="bold"
                 android:textSize="16sp"
-                android:gravity="center"
-                android:fontFamily="sans-serif-medium"
-                android:padding="0dp"
+                android:textStyle="bold"
                 app:cornerRadius="20dp"
                 app:iconGravity="textStart"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/btnSettings"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageButton
                 android:id="@+id/btnSettings"
@@ -78,13 +78,34 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- 🔹 Search Field -->
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etSearch"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/searchInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableStart="@drawable/ic_search"
-            android:hint="Search for a city..."
-            android:inputType="text" />
+            android:layout_marginBottom="16dp"
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp"
+            app:boxStrokeColor="@color/gray_500"
+            app:boxStrokeWidth="1dp"
+            app:endIconDrawable="@drawable/ic_search"
+            app:endIconMode="custom"
+            app:endIconTint="@color/gray_500">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etSearch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/search_city"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:singleLine="true"
+                android:textColor="@android:color/black"
+                android:textColorHint="@color/darker_gray"
+                android:textSize="16sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
 
         <!-- 🔹 CardView com dados do clima atual -->
         <androidx.cardview.widget.CardView
@@ -98,8 +119,8 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:background="@drawable/bg_weather_card">
+                android:background="@drawable/bg_weather_card"
+                android:padding="16dp">
 
                 <TextView
                     android:id="@+id/tvCity"
@@ -197,18 +218,18 @@
                     android:id="@+id/tvHourlyTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
                     android:text="@string/hourly_forecast"
                     android:textColor="@android:color/black"
-                    android:textStyle="bold"
                     android:textSize="16sp"
-                    android:layout_marginBottom="8dp" />
+                    android:textStyle="bold" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvHourly"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:overScrollMode="never"
                     android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never"
                     tools:listitem="@layout/item_hourly_forecast" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -232,36 +253,38 @@
                     android:id="@+id/tvDailyTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
                     android:text="@string/daily_forecast"
                     android:textColor="@android:color/black"
-                    android:textStyle="bold"
                     android:textSize="16sp"
-                    android:layout_marginBottom="8dp" />
+                    android:textStyle="bold" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rvDaily"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:overScrollMode="never"
                     android:nestedScrollingEnabled="false"
+                    android:overScrollMode="never"
                     tools:listitem="@layout/item_daily_forecast" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- 🔹 Weather Details Card -->
+        <!-- 🔹 Weather Details Card - completo -->
         <androidx.cardview.widget.CardView
             android:id="@+id/detailsCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             app:cardCornerRadius="16dp"
-            app:cardElevation="4dp">
+            app:cardElevation="6dp"
+            android:foreground="?attr/selectableItemBackground">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="16dp"
+                android:background="@color/gray_50">
 
                 <TextView
                     android:id="@+id/tvDetailsTitle"
@@ -288,18 +311,30 @@
                         android:layout_height="wrap_content"
                         android:layout_columnWeight="1"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:padding="4dp">
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_humidity"
-                            android:tint="@android:color/darker_gray"/>
+
+                        <FrameLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_circle_icon">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_humidity"
+                                android:tint="@color/blue_500" />
+                        </FrameLayout>
+
                         <TextView
                             android:id="@+id/tvHumidityDetail"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
-                            android:text="--%" />
+                            android:text="--%"
+                            android:textStyle="bold"
+                            android:textSize="14sp" />
                     </LinearLayout>
 
                     <!-- Wind -->
@@ -308,18 +343,30 @@
                         android:layout_height="wrap_content"
                         android:layout_columnWeight="1"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:padding="4dp">
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_wind"
-                            android:tint="@android:color/darker_gray"/>
+
+                        <FrameLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_circle_icon">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_wind"
+                                android:tint="@color/blue_500" />
+                        </FrameLayout>
+
                         <TextView
                             android:id="@+id/tvWindDetail"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
-                            android:text="-- m/s" />
+                            android:text="-- m/s"
+                            android:textStyle="bold"
+                            android:textSize="14sp" />
                     </LinearLayout>
 
                     <!-- Visibility -->
@@ -328,18 +375,30 @@
                         android:layout_height="wrap_content"
                         android:layout_columnWeight="1"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:padding="4dp">
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_visibility"
-                            android:tint="@android:color/darker_gray"/>
+
+                        <FrameLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_circle_icon">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_visibility"
+                                android:tint="@color/blue_500" />
+                        </FrameLayout>
+
                         <TextView
                             android:id="@+id/tvVisibility"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
-                            android:text="-- km" />
+                            android:text="-- km"
+                            android:textStyle="bold"
+                            android:textSize="14sp" />
                     </LinearLayout>
 
                     <!-- Pressure -->
@@ -348,18 +407,30 @@
                         android:layout_height="wrap_content"
                         android:layout_columnWeight="1"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:padding="4dp">
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_pressure"
-                            android:tint="@android:color/darker_gray"/>
+
+                        <FrameLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_circle_icon">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_pressure"
+                                android:tint="@color/blue_500" />
+                        </FrameLayout>
+
                         <TextView
                             android:id="@+id/tvPressure"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
-                            android:text="-- hPa" />
+                            android:text="-- hPa"
+                            android:textStyle="bold"
+                            android:textSize="14sp" />
                     </LinearLayout>
 
                     <!-- Sunrise -->
@@ -368,18 +439,30 @@
                         android:layout_height="wrap_content"
                         android:layout_columnWeight="1"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:padding="4dp">
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_sunrise"
-                            android:tint="@android:color/darker_gray"/>
+
+                        <FrameLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_circle_icon">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_sunrise"
+                                android:tint="@color/blue_500" />
+                        </FrameLayout>
+
                         <TextView
                             android:id="@+id/tvSunrise"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
-                            android:text="--:--" />
+                            android:text="--:--"
+                            android:textStyle="bold"
+                            android:textSize="14sp" />
                     </LinearLayout>
 
                     <!-- Sunset -->
@@ -388,18 +471,30 @@
                         android:layout_height="wrap_content"
                         android:layout_columnWeight="1"
                         android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:padding="4dp">
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:src="@drawable/ic_sunset"
-                            android:tint="@android:color/darker_gray"/>
+
+                        <FrameLayout
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_circle_icon">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_sunset"
+                                android:tint="@color/blue_500" />
+                        </FrameLayout>
+
                         <TextView
                             android:id="@+id/tvSunset"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
-                            android:text="--:--" />
+                            android:text="--:--"
+                            android:textStyle="bold"
+                            android:textSize="14sp" />
                     </LinearLayout>
 
                 </GridLayout>
@@ -411,8 +506,8 @@
             android:id="@+id/progress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:layout_gravity="center"
+            android:layout_marginTop="16dp"
             android:visibility="gone" />
 
     </LinearLayout>
