@@ -324,7 +324,7 @@
                                 android:layout_height="20dp"
                                 android:layout_gravity="center"
                                 android:src="@drawable/ic_humidity"
-                                android:tint="@color/blue_500" />
+                                app:tint="@color/blue_500" />
                         </FrameLayout>
 
                         <TextView
