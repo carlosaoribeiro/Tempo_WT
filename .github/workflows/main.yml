@@ -2,63 +2,82 @@ name: Android CI/CD
 
 on:
   push:
-    branches: [ "main" ]   # roda quando fizer merge na main
+    branches: [ "main" ]        # roda quando fizer merge na main
   pull_request:
-    branches: [ "main" ]   # roda nos PRs para validar
+    branches: [ "main" ]        # valida nos PRs
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    steps:
-      # 1. Checkout do código
-      - name: Checkout
-        uses: actions/checkout@v3
+    # Variáveis de ambiente que o Gradle vai ler (ver build.gradle acima)
+    env:
+      MYAPP_KEYSTORE: tempo_wt.jks
+      MYAPP_KEYSTORE_PASSWORD: ${{ secrets.MYAPP_KEYSTORE_PASSWORD }}
+      MYAPP_KEY_ALIAS: ${{ secrets.MYAPP_KEY_ALIAS }}
+      MYAPP_KEY_PASSWORD: ${{ secrets.MYAPP_KEY_PASSWORD }}
 
-      # 2. Setup do JDK
+    steps:
+      # 1) Checkout
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2) JDK 17
       - name: Setup JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      # 3. Cache do Gradle
+      # 3) Cache Gradle
       - name: Cache Gradle
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle
+          restore-keys: ${{ runner.os }}-gradle
 
-      # 4. Permissão para gradlew
-      - name: Grant execute permission for gradlew
+      # 4) Executável
+      - name: Make gradlew executable
         run: chmod +x gradlew
 
-      # 5. Build normal (inclui lint e testes)
-      - name: Build with Gradle
+      # 5) Restaurar o keystore a partir do Secret (Base64 -> .jks)
+      - name: Restore keystore from secrets
+        run: |
+          echo "${{ secrets.MYAPP_KEYSTORE_BASE64 }}" | base64 --decode > "$MYAPP_KEYSTORE"
+
+      # 6) Lint + testes + build
+      - name: Build (lint + unit tests)
         run: ./gradlew clean build
 
-      # 6. Gerar APK Debug
-      - name: Build Debug APK
+      # 7) Gerar APK Debug (útil para QA rápido)
+      - name: Assemble Debug APK
         run: ./gradlew assembleDebug
 
-      # 7. Upload APK como artefato do workflow
       - name: Upload Debug APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: TempoWT-Debug-APK
+          name: app-debug
           path: app/build/outputs/apk/debug/app-debug.apk
 
-      # 8. Gerar AAB Release
-      - name: Build Release AAB
+      # 8) Gerar Release AAB (ASSINADO)
+      - name: Assemble Release AAB (signed)
         run: ./gradlew bundleRelease
 
-      # 9. Upload AAB como artefato do workflow
       - name: Upload Release AAB
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: TempoWT-Release-AAB
+          name: app-release-aab
           path: app/build/outputs/bundle/release/app-release.aab
+
+      # (Opcional) Também gerar Release APK assinado
+      - name: Assemble Release APK (signed)
+        run: ./gradlew assembleRelease
+
+      - name: Upload Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: app/build/outputs/apk/release/app-release.apk
