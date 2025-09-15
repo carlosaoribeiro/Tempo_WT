@@ -1,6 +1,7 @@
 package com.carlosribeiro.tempo_wt.ui
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -26,6 +27,7 @@ import com.google.android.gms.location.LocationServices
 import java.text.SimpleDateFormat
 import java.util.*
 import android.text.InputFilter
+import androidx.annotation.RequiresPermission
 
 class MainActivity : AppCompatActivity() {
 
@@ -265,6 +267,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     private fun getUserLocation() {
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             if (location != null) {
@@ -274,6 +277,35 @@ class MainActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "Não foi possível obter a localização.", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    @SuppressLint("MissingPermission") // diz ao Lint que você já está cuidando das permissões
+    private fun getLastLocation() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                location?.let {
+                    // TODO: usar a localização (ex.: atualizar UI, salvar no ViewModel, etc.)
+                }
+            }
+        } else {
+            // TODO: tratar ausência de permissão (ex.: pedir permissão ao usuário)
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    android.Manifest.permission.ACCESS_FINE_LOCATION,
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+                ),
+                1001
+            )
         }
     }
 
