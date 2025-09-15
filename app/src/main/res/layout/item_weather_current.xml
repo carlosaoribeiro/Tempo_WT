@@ -70,8 +70,8 @@
             android:layout_height="64dp"
             android:layout_gravity="end"
             android:src="@drawable/ic_cloud"
-            android:tint="@android:color/white"
-            android:contentDescription="Weather icon" />
+            android:contentDescription="Weather icon"
+            app:tint="@android:color/white" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

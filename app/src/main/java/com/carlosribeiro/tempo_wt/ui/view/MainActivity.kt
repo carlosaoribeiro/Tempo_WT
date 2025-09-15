@@ -1,6 +1,7 @@
 package com.carlosribeiro.tempo_wt.ui
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -82,7 +83,6 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Weather information not available yet", Toast.LENGTH_SHORT).show()
             }
         }
-
 
         // 🔄 Configuração dos RecyclerViews
         binding.rvHourly.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
@@ -265,15 +265,33 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // ✅ corrigido: verificação explícita + @SuppressLint
+    @SuppressLint("MissingPermission")
     private fun getUserLocation() {
-        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-            if (location != null) {
-                val lat = location.latitude
-                val lon = location.longitude
-                viewModel.loadWeatherByCoordinates(lat, lon)
-            } else {
-                Toast.makeText(this, "Não foi possível obter a localização.", Toast.LENGTH_SHORT).show()
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                if (location != null) {
+                    val lat = location.latitude
+                    val lon = location.longitude
+                    viewModel.loadWeatherByCoordinates(lat, lon)
+                } else {
+                    Toast.makeText(this, "Não foi possível obter a localização.", Toast.LENGTH_SHORT).show()
+                }
             }
+        } else {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
         }
     }
 
