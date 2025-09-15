@@ -24,6 +24,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import java.text.SimpleDateFormat
 import java.util.*
+import android.text.InputFilter
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,16 +37,22 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Clique na lupa do campo de busca
+        // 🔎 Clique na lupa
         binding.searchInputLayout.setEndIconOnClickListener {
-            val city = binding.etSearch.text?.toString().orEmpty()
-            if (city.isNotBlank()) {
-                binding.progress.visibility = View.VISIBLE
-                viewModel.loadWeather(city)
-            } else {
-                Toast.makeText(this, "Please enter a city", Toast.LENGTH_SHORT).show()
-            }
+            submitCity()
         }
+
+        // 🔤 Filtro de caracteres válidos
+        val cityInputFilter = InputFilter { source, start, end, _, _, _ ->
+            for (i in start until end) {
+                val ch = source[i]
+                if (!(ch.isLetter() || ch == ' ' || ch == '-' || ch == '\'' || ch == '’' || ch == '.')) {
+                    return@InputFilter "" // bloqueia caractere inválido
+                }
+            }
+            null
+        }
+        binding.etSearch.filters = arrayOf(cityInputFilter, InputFilter.LengthFilter(50))
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
@@ -55,11 +62,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // 🔄 Configuração dos RecyclerViews
-        binding.rvHourly.layoutManager = LinearLayoutManager(
-            this,
-            LinearLayoutManager.HORIZONTAL,
-            false
-        )
+        binding.rvHourly.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.rvDaily.layoutManager = LinearLayoutManager(this)
 
         val api = RetrofitInstance.api
@@ -67,13 +70,9 @@ class MainActivity : AppCompatActivity() {
         val factory = WeatherViewModelFactory(repository)
         viewModel = ViewModelProvider(this, factory)[WeatherViewModel::class.java]
 
-        fun now(): String = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-
-        // 🔎 Busca por cidade
+        // 🔎 Busca ao pressionar "enter"
         binding.etSearch.setOnEditorActionListener { _, _, _ ->
-            val city = binding.etSearch.text?.toString().orEmpty().ifBlank { "Osasco" }
-            binding.progress.visibility = View.VISIBLE
-            viewModel.loadWeather(city)
+            submitCity()
             true
         }
 
@@ -146,7 +145,12 @@ class MainActivity : AppCompatActivity() {
             }
 
             result.onFailure { e ->
-                Toast.makeText(this, "Erro (current): ${e.message}", Toast.LENGTH_SHORT).show()
+                val msg = if (e.message?.contains("404") == true) {
+                    "City not found. Please check the name."
+                } else {
+                    "Error fetching current weather: ${e.message}"
+                }
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
                 Log.e("API_CURRENT", "Falha", e)
             }
         }
@@ -194,13 +198,34 @@ class MainActivity : AppCompatActivity() {
             }
 
             result.onFailure { e ->
-                Toast.makeText(this, "Erro forecast: ${e.message}", Toast.LENGTH_SHORT).show()
+                val msg = if (e.message?.contains("404") == true) {
+                    "City not found. Please check the name."
+                } else {
+                    "Error fetching forecast: ${e.message}"
+                }
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
                 Log.e("API_FORECAST", "Falha", e)
             }
         }
 
         // 🌍 Inicializa com localização atual
         checkLocationPermissionAndFetchWeather()
+    }
+
+    private fun submitCity() {
+        val city = binding.etSearch.text?.toString()?.trim().orEmpty()
+        when {
+            city.isBlank() -> {
+                Toast.makeText(this, "Please enter a city name", Toast.LENGTH_SHORT).show()
+            }
+            city.matches(Regex("^[0-9]+$")) -> {
+                Toast.makeText(this, "City name cannot be only numbers", Toast.LENGTH_SHORT).show()
+            }
+            else -> {
+                binding.progress.visibility = View.VISIBLE
+                viewModel.loadWeather(city)
+            }
+        }
     }
 
     private fun checkLocationPermissionAndFetchWeather() {
