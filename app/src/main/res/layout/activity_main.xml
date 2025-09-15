@@ -356,7 +356,7 @@
                                 android:layout_height="20dp"
                                 android:layout_gravity="center"
                                 android:src="@drawable/ic_wind"
-                                android:tint="@color/blue_500" />
+                                app:tint="@color/blue_500" />
                         </FrameLayout>
 
                         <TextView
@@ -388,7 +388,7 @@
                                 android:layout_height="20dp"
                                 android:layout_gravity="center"
                                 android:src="@drawable/ic_visibility"
-                                android:tint="@color/blue_500" />
+                                app:tint="@color/blue_500" />
                         </FrameLayout>
 
                         <TextView
@@ -420,7 +420,7 @@
                                 android:layout_height="20dp"
                                 android:layout_gravity="center"
                                 android:src="@drawable/ic_pressure"
-                                android:tint="@color/blue_500" />
+                                app:tint="@color/blue_500" />
                         </FrameLayout>
 
                         <TextView
@@ -452,7 +452,7 @@
                                 android:layout_height="20dp"
                                 android:layout_gravity="center"
                                 android:src="@drawable/ic_sunrise"
-                                android:tint="@color/blue_500" />
+                                app:tint="@color/blue_500" />
                         </FrameLayout>
 
                         <TextView
@@ -484,7 +484,7 @@
                                 android:layout_height="20dp"
                                 android:layout_gravity="center"
                                 android:src="@drawable/ic_sunset"
-                                android:tint="@color/blue_500" />
+                                app:tint="@color/blue_500" />
                         </FrameLayout>
 
                         <TextView
