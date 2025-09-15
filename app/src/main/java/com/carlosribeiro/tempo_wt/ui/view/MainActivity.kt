@@ -1,6 +1,7 @@
 package com.carlosribeiro.tempo_wt.ui
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -60,6 +61,28 @@ class MainActivity : AppCompatActivity() {
         binding.btnLocation.setOnClickListener {
             checkLocationPermissionAndFetchWeather()
         }
+
+        // 📤 Botão de compartilhar temperatura
+        binding.btnShared.setOnClickListener {
+            val temp = binding.tvTemp.text.toString()
+            val city = binding.tvCity.text.toString()
+
+            if (temp.isNotBlank() && city.isNotBlank()) {
+                val message = "Current temperature in $city is $temp 🌡️"
+
+                val sendIntent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_TEXT, message)
+                    type = "text/plain"
+                }
+
+                val shareIntent = Intent.createChooser(sendIntent, "Share weather via")
+                startActivity(shareIntent)
+            } else {
+                Toast.makeText(this, "Weather information not available yet", Toast.LENGTH_SHORT).show()
+            }
+        }
+
 
         // 🔄 Configuração dos RecyclerViews
         binding.rvHourly.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
