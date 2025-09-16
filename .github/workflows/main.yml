@@ -2,15 +2,14 @@ name: Android CI/CD
 
 on:
   push:
-    branches: [ "main" ]        # roda quando fizer merge na main
+    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]        # valida nos PRs
+    branches: [ "main" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    # Variáveis de ambiente que o Gradle vai ler (ver build.gradle acima)
     env:
       MYAPP_KEYSTORE: tempo_wt.jks
       MYAPP_KEYSTORE_PASSWORD: ${{ secrets.MYAPP_KEYSTORE_PASSWORD }}
@@ -18,18 +17,15 @@ jobs:
       MYAPP_KEY_PASSWORD: ${{ secrets.MYAPP_KEY_PASSWORD }}
 
     steps:
-      # 1) Checkout
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 2) JDK 17
       - name: Setup JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      # 3) Cache Gradle
       - name: Cache Gradle
         uses: actions/cache@v4
         with:
@@ -39,20 +35,16 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-gradle
 
-      # 4) Executável
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      # 5) Restaurar o keystore a partir do Secret (Base64 -> .jks)
       - name: Restore keystore from secrets
         run: |
           echo "${{ secrets.MYAPP_KEYSTORE_BASE64 }}" | base64 --decode > "$MYAPP_KEYSTORE"
 
-      # 6) Lint + testes + build
       - name: Build (lint + unit tests)
         run: ./gradlew clean build
 
-      # 7) Gerar APK Debug (útil para QA rápido)
       - name: Assemble Debug APK
         run: ./gradlew assembleDebug
 
@@ -62,7 +54,6 @@ jobs:
           name: app-debug
           path: app/build/outputs/apk/debug/app-debug.apk
 
-      # 8) Gerar Release AAB (ASSINADO)
       - name: Assemble Release AAB (signed)
         run: ./gradlew bundleRelease
 
@@ -72,7 +63,6 @@ jobs:
           name: app-release-aab
           path: app/build/outputs/bundle/release/app-release.aab
 
-      # (Opcional) Também gerar Release APK assinado
       - name: Assemble Release APK (signed)
         run: ./gradlew assembleRelease
 
@@ -81,3 +71,13 @@ jobs:
         with:
           name: app-release-apk
           path: app/build/outputs/apk/release/app-release.apk
+
+      # 🚀 Deploy para Google Play
+      - name: Deploy to Google Play
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.MYAPP_PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.carlosribeiro.tempo_wt
+          releaseFiles: app/build/outputs/bundle/release/app-release.aab
+          track: internal
+          status: completed
