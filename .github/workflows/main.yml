@@ -10,12 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    env:
-      MYAPP_KEYSTORE: tempo_wt.jks
-      MYAPP_KEYSTORE_PASSWORD: ${{ secrets.MYAPP_KEYSTORE_PASSWORD }}
-      MYAPP_KEY_ALIAS: ${{ secrets.MYAPP_KEY_ALIAS }}
-      MYAPP_KEY_PASSWORD: ${{ secrets.MYAPP_KEY_PASSWORD }}
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,10 +32,6 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Restore keystore from secrets
-        run: |
-          echo "${{ secrets.MYAPP_KEYSTORE_BASE64 }}" | base64 --decode > "$MYAPP_KEYSTORE"
-
       - name: Build (lint + unit tests)
         run: ./gradlew clean build
 
@@ -54,10 +44,10 @@ jobs:
           name: app-debug
           path: app/build/outputs/apk/debug/app-debug.apk
 
-      # 🔹 Gera só o AAB (Google Play exige .aab)
-      - name: Assemble Release AAB (signed)
+      # 🔹 Gera o AAB (não assinado, Google Play assina automaticamente)
+      - name: Assemble Release AAB
         run: ./gradlew bundleRelease
-
+  
       - name: Upload Release AAB
         uses: actions/upload-artifact@v4
         with:
