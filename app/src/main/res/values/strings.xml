@@ -32,4 +32,6 @@
     <string name="thunderstorm">Thunderstorm</string>
     <string name="snow">Snow</string>
     <string name="mist">Mist</string>
+    <string name="settings">settings</string>
+
 </resources>
