@@ -54,6 +54,7 @@ jobs:
           name: app-debug
           path: app/build/outputs/apk/debug/app-debug.apk
 
+      # 🔹 Gera só o AAB (Google Play exige .aab)
       - name: Assemble Release AAB (signed)
         run: ./gradlew bundleRelease
 
@@ -62,15 +63,6 @@ jobs:
         with:
           name: app-release-aab
           path: app/build/outputs/bundle/release/app-release.aab
-
-      - name: Assemble Release APK (signed)
-        run: ./gradlew assembleRelease
-
-      - name: Upload Release APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-release-apk
-          path: app/build/outputs/apk/release/app-release.apk
 
       # 🚀 Deploy para Google Play
       - name: Deploy to Google Play
