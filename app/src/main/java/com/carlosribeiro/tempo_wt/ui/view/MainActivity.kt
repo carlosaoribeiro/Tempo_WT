@@ -1,10 +1,11 @@
-package com.carlosribeiro.tempo_wt.ui
+package com.carlosribeiro.tempo_wt.ui.view
 
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.text.InputFilter
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -14,19 +15,19 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
-import com.carlosribeiro.tempo_wt.ui.model.ForecastUiItem
 import com.carlosribeiro.tempo_wt.data.remote.RetrofitInstance
 import com.carlosribeiro.tempo_wt.data.repository.WeatherRepository
 import com.carlosribeiro.tempo_wt.databinding.ActivityMainBinding
 import com.carlosribeiro.tempo_wt.ui.adapter.DailyForecastAdapter
 import com.carlosribeiro.tempo_wt.ui.adapter.HourlyForecastAdapter
+import com.carlosribeiro.tempo_wt.ui.model.ForecastUiItem
 import com.carlosribeiro.tempo_wt.ui.viewmodel.WeatherViewModel
 import com.carlosribeiro.tempo_wt.ui.viewmodel.WeatherViewModelFactory
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import java.text.SimpleDateFormat
-import java.util.*
-import android.text.InputFilter
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
@@ -85,7 +86,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         // 🔄 Configuração dos RecyclerViews
-        binding.rvHourly.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.rvHourly.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.rvDaily.layoutManager = LinearLayoutManager(this)
 
         val api = RetrofitInstance.api
@@ -152,7 +154,7 @@ class MainActivity : AppCompatActivity() {
                 val visibilityText = if (viewModel.getCurrentUnits() == "metric") {
                     "${visibilityMeters / 1000} km"
                 } else {
-                    String.format(Locale.getDefault(), "%.1f mi", visibilityMeters / 1609.34)
+                    String.Companion.format(Locale.getDefault(), "%.1f mi", visibilityMeters / 1609.34)
                 }
                 binding.tvVisibility.text = visibilityText
 

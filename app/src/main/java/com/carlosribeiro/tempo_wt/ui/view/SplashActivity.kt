@@ -1,13 +1,15 @@
-package com.carlosribeiro.tempo_wt
+package com.carlosribeiro.tempo_wt.ui.view
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.carlosribeiro.tempo_wt.ui.MainActivity
+import com.carlosribeiro.tempo_wt.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
