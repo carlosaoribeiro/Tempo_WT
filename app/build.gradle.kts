@@ -22,12 +22,13 @@ android {
 
     signingConfigs {
         create("release") {
-            // Caminho do keystore: sempre vem do pipeline (ou variável local)
-            val keystorePath = project.findProperty("MYAPP_KEYSTORE") as String?
-                ?: System.getenv("MYAPP_KEYSTORE")
+            val keystorePath: String? =
+                project.findProperty("MYAPP_KEYSTORE") as String? ?: System.getenv("MYAPP_KEYSTORE")
 
             if (keystorePath != null) {
                 storeFile = file(keystorePath)
+            } else {
+                println("⚠️ Nenhum keystore encontrado (CI precisa do secret MYAPP_KEYSTORE)")
             }
 
             storePassword = project.findProperty("MYAPP_KEYSTORE_PASSWORD") as String?
