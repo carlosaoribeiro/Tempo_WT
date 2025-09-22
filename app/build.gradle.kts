@@ -17,9 +17,28 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-        // BuildConfig custom field
         buildConfigField("String", "WEATHER_API_KEY", "\"bb6ecc2665b7996900f60174b6731200\"")
+    }
+
+    signingConfigs {
+        create("release") {
+            // O caminho do keystore sempre vem da pipeline (Decode Keystore no YAML)
+            val keystorePath = project.findProperty("MYAPP_KEYSTORE") as String?
+                ?: System.getenv("MYAPP_KEYSTORE")
+
+            if (keystorePath != null) {
+                storeFile = file(keystorePath)
+            }
+
+            storePassword = project.findProperty("MYAPP_KEYSTORE_PASSWORD") as String?
+                ?: System.getenv("MYAPP_KEYSTORE_PASSWORD")
+
+            keyAlias = project.findProperty("MYAPP_KEY_ALIAS") as String?
+                ?: System.getenv("MYAPP_KEY_ALIAS")
+
+            keyPassword = project.findProperty("MYAPP_KEY_PASSWORD") as String?
+                ?: System.getenv("MYAPP_KEY_PASSWORD")
+        }
     }
 
     buildTypes {
@@ -29,8 +48,11 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // 🔑 Garante que o release use esta assinatura
+            signingConfig = signingConfigs.getByName("release")
         }
     }
+
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -42,12 +64,11 @@ android {
 
     buildFeatures {
         viewBinding = true
-        buildConfig = true // 👈 habilita o BuildConfig (corrige seu erro)
+        buildConfig = true
     }
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -77,8 +98,8 @@ dependencies {
 
     implementation(libs.coil)
 
-    //Location
-    implementation ("com.google.android.gms:play-services-location:21.0.1")
+    // Location
+    implementation("com.google.android.gms:play-services-location:21.0.1")
 
     // Testes unitários
     testImplementation("junit:junit:4.13.2")
@@ -96,5 +117,3 @@ dependencies {
     // Truth (asserts mais legíveis)
     androidTestImplementation("com.google.truth:truth:1.1.5")
 }
-
-
