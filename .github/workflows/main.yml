@@ -44,7 +44,11 @@ jobs:
           name: app-debug
           path: app/build/outputs/apk/debug/app-debug.apk
 
-      # 🔹 Gera o AAB (não assinado, Google Play assina automaticamente)
+      # 🔑 Recria a keystore no ambiente do GitHub Actions
+      - name: Decode Keystore
+        run: echo "${{ secrets.MYAPP_KEYSTORE_BASE64 }}" | base64 --decode > tempo_wt.jks
+
+      # 🔹 Gera o AAB assinado com a keystore
       - name: Assemble Release AAB
         run: ./gradlew bundleRelease
   
