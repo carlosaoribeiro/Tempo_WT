@@ -28,7 +28,7 @@
 
         <!-- SplashActivity como LAUNCHER (se você tem SplashActivity) -->
         <activity
-            android:name="com.carlosribeiro.tempo_wt.ui.view.SplashActivity"
+            android:name="com.carlosribeiro.tempo_wt.ui.SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.Tempo_WT"
             tools:ignore="MissingClass">
