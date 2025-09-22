@@ -8,10 +8,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.carlosribeiro.tempo_wt.R
-
 import com.carlosribeiro.tempo_wt.ui.model.ForecastUiItem
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.roundToInt   // <-- IMPORT AQUI
 
 class DailyForecastAdapter(
     private val items: List<ForecastUiItem>
@@ -32,11 +32,12 @@ class DailyForecastAdapter(
 
             tvDesc.text = item.description
 
-            // % de chuva – você pode adaptar se vier do modelo
-            tvRain.text = "${(0..100).random()}%" // placeholder, se não tiver no modelo
+            // % de chuva – se não vier no modelo, você pode deixar "--%" em vez de random
+            tvRain.text = "${item.rain ?: 0}%"
 
-            tvTempMax.text = "${item.maxTemp.toInt()}°"
-            tvTempMin.text = "${item.minTemp.toInt()}°"
+            // arredonda valores
+            tvTempMax.text = "${item.maxTemp.roundToInt()}°"
+            tvTempMin.text = "${item.minTemp.roundToInt()}°"
 
             val url = "https://openweathermap.org/img/wn/${item.icon}@2x.png"
             ivIcon.load(url)

@@ -8,39 +8,47 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.carlosribeiro.tempo_wt.R
-import com.carlosribeiro.tempo_wt.ui.model.ForecastUiItem
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.roundToInt
 
-class HourlyForecastAdapter(
-    private val items: List<ForecastUiItem>
-) : RecyclerView.Adapter<HourlyForecastAdapter.HourlyViewHolder>() {
+class HourlyForecastAdapter(private val items: List<HourlyForecast>) :
+    RecyclerView.Adapter<HourlyForecastAdapter.HourlyViewHolder>() {
 
-    class HourlyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        private val tvHour: TextView = view.findViewById(R.id.tvHour)
-        private val tvTemp: TextView = view.findViewById(R.id.tvTempHour)
-        private val ivIcon: ImageView = view.findViewById(R.id.ivIconHour)
-
-        fun bind(item: ForecastUiItem) {
-            // Mostrar apenas a hora (ex: 14h)
-            val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
-            tvHour.text = sdf.format(Date(item.date * 1000))
-
-            tvTemp.text = "${item.maxTemp}°C"  // usamos maxTemp para simplificar
-            val url = "https://openweathermap.org/img/wn/${item.icon}@2x.png"
-            ivIcon.load(url)
-        }
+    inner class HourlyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val tvHour: TextView = view.findViewById(R.id.tvHour)
+        val ivIcon: ImageView = view.findViewById(R.id.ivIconHour)
+        val tvTemp: TextView = view.findViewById(R.id.tvTempHour)
+        val tvRainChance: TextView = view.findViewById(R.id.tvRainChance) // ✅ este é o id do XML
     }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HourlyViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_hourly_forecast, parent, false)
+            .inflate(R.layout.item_hourly, parent, false)
         return HourlyViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: HourlyViewHolder, position: Int) {
-        holder.bind(items[position])
+        val item = items[position]
+
+        // Hora (já vem formatada de MainActivity)
+        holder.tvHour.text = item.hour
+
+        // Temperatura
+        holder.tvTemp.text = "${item.temp.roundToInt()}°C"
+
+        // % de chuva
+        holder.tvRainChance.text = "${item.rain ?: 0}%"
+
+        // Ícone
+        holder.ivIcon.load(item.iconUrl) {
+            crossfade(true)
+            placeholder(R.drawable.ic_weather_placeholder)
+            error(R.drawable.ic_weather_error)
+        }
     }
 
-    override fun getItemCount() = items.size
+
+    override fun getItemCount(): Int = items.size
 }
