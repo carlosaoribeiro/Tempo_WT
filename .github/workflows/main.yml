@@ -50,9 +50,13 @@ jobs:
           echo "${{ secrets.MYAPP_KEYSTORE_BASE64 }}" | base64 --decode > $HOME/keystore.jks
         shell: bash
 
-      # 🔹 Gera o AAB assinado com a keystore (tudo em uma linha)
+      # 🔹 Gera o AAB assinado com a keystore
       - name: Assemble Release AAB
         run: ./gradlew clean bundleRelease -PMYAPP_KEYSTORE=$HOME/keystore.jks -PMYAPP_KEYSTORE_PASSWORD=${{ secrets.MYAPP_KEYSTORE_PASSWORD }} -PMYAPP_KEY_ALIAS=${{ secrets.MYAPP_KEY_ALIAS }} -PMYAPP_KEY_PASSWORD=${{ secrets.MYAPP_KEY_PASSWORD }}
+
+      # ✅ Verifica se o AAB está assinado
+      - name: Verify AAB signature
+        run: jarsigner -verify -verbose -certs app/build/outputs/bundle/release/app-release.aab
 
       - name: Upload Release AAB
         uses: actions/upload-artifact@v4
