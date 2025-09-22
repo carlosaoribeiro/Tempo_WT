@@ -32,9 +32,9 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      # 🔹 Build com testes e lint
+      # 🔹 Build apenas Debug (sem assinar)
       - name: Build (lint + unit tests)
-        run: ./gradlew clean build
+        run: ./gradlew clean buildDebug
 
       # 🔹 Gera APK de debug (para teste)
       - name: Assemble Debug APK
