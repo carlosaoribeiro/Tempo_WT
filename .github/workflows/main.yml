@@ -59,11 +59,12 @@ jobs:
 
       # 🔹 Gera o AAB assinado
       - name: Assemble Release AAB
-        run: ./gradlew bundleRelease \
-          -PMYAPP_KEYSTORE=$HOME/keystore.jks \
-          -PMYAPP_KEYSTORE_PASSWORD=${{ secrets.MYAPP_KEYSTORE_PASSWORD }} \
-          -PMYAPP_KEY_ALIAS=${{ secrets.MYAPP_KEY_ALIAS }} \
-          -PMYAPP_KEY_PASSWORD=${{ secrets.MYAPP_KEY_PASSWORD }}
+        run: |
+            ./gradlew bundleRelease \
+              -PMYAPP_KEYSTORE=$HOME/keystore.jks \
+              -PMYAPP_KEYSTORE_PASSWORD=${{ secrets.MYAPP_KEYSTORE_PASSWORD }} \
+              -PMYAPP_KEY_ALIAS=${{ secrets.MYAPP_KEY_ALIAS }} \
+              -PMYAPP_KEY_PASSWORD=${{ secrets.MYAPP_KEY_PASSWORD }}}
 
       # ✅ Verifica se o AAB está assinado
       - name: Verify AAB signature
