@@ -6,5 +6,6 @@ data class ForecastUiItem(
     val maxTemp: Double,
     val description: String,
     val icon: String,
-    val rain: Int? = null // 🌧️ porcentagem de chuva
+    val rain: Int? = null,
+    val temp: Double? = null // 🌡️ só usado em previsão horária
 )

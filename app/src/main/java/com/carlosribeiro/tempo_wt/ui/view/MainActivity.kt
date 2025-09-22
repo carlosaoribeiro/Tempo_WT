@@ -19,6 +19,7 @@ import com.carlosribeiro.tempo_wt.data.remote.RetrofitInstance
 import com.carlosribeiro.tempo_wt.data.repository.WeatherRepository
 import com.carlosribeiro.tempo_wt.databinding.ActivityMainBinding
 import com.carlosribeiro.tempo_wt.ui.adapter.DailyForecastAdapter
+import com.carlosribeiro.tempo_wt.ui.adapter.HourlyForecast
 import com.carlosribeiro.tempo_wt.ui.adapter.HourlyForecastAdapter
 import com.carlosribeiro.tempo_wt.ui.model.ForecastUiItem
 import com.carlosribeiro.tempo_wt.ui.viewmodel.WeatherViewModel
@@ -28,6 +29,7 @@ import com.google.android.gms.location.LocationServices
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.math.roundToInt
 
 class MainActivity : AppCompatActivity() {
 
@@ -126,10 +128,11 @@ class MainActivity : AppCompatActivity() {
                 val windUnit = if (viewModel.getCurrentUnits() == "metric") "m/s" else "mph"
 
                 // 🌡️ Clima principal
-                binding.tvTemp.text = main?.temp?.let { "$it°$unitSymbol" } ?: "--°$unitSymbol"
-                binding.tvFeelsLike.text = "Sensação: ${main?.feels_like ?: "--"}°$unitSymbol"
+                binding.tvTemp.text = main?.temp?.let { "${it.roundToInt()}°$unitSymbol" } ?: "--°$unitSymbol"
+                binding.tvFeelsLike.text = "Sensação: ${(main?.feels_like)?.roundToInt() ?: "--"}°$unitSymbol"
                 binding.tvHumidity.text = "Umidade: ${main?.humidity ?: "--"}%"
                 binding.tvWind.text = "Vento: ${response.wind?.speed ?: "--"} $windUnit"
+
 
                 // 🌤️ Descrição + ícone
                 val w = response.weather?.firstOrNull()
@@ -191,15 +194,16 @@ class MainActivity : AppCompatActivity() {
                     .take(12)
                     .map { data ->
                         val w = data.weather.firstOrNull()
-                        ForecastUiItem(
-                            date = data.dt,
-                            minTemp = data.main.temp ?: 0.0,
-                            maxTemp = data.main.temp ?: 0.0,
-                            description = w?.description ?: "-",
-                            icon = w?.icon ?: "",
+                        HourlyForecast(
+                            hour = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(data.dt * 1000)),
+                            temp = data.main.temp ?: 0.0, // Double
+                            iconUrl = "https://openweathermap.org/img/wn/${w?.icon}@2x.png",
                             rain = (data.pop?.times(100))?.toInt()
                         )
                     }
+
+                binding.rvHourly.adapter = HourlyForecastAdapter(hourlyItems)
+
                 binding.rvHourly.adapter = HourlyForecastAdapter(hourlyItems)
 
                 // 📅 Previsão diária (7 dias)
