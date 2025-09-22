@@ -32,9 +32,9 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      # 🔹 Build apenas Debug (sem assinar)
+      # 🔹 Build com testes e lint
       - name: Build (lint + unit tests)
-        run: ./gradlew clean buildDebug
+        run: ./gradlew clean build
 
       # 🔹 Gera APK de debug (para teste)
       - name: Assemble Debug APK
@@ -48,23 +48,16 @@ jobs:
 
       # 🔑 Recria a keystore no ambiente do GitHub Actions
       - name: Decode Keystore
-        run: |
-          echo "${{ secrets.MYAPP_KEYSTORE_BASE64 }}" | base64 --decode > $HOME/keystore.jks
+        run: echo "${{ secrets.MYAPP_KEYSTORE_BASE64 }}" | base64 --decode > $HOME/keystore.jks
         shell: bash
 
       # 🔍 Confere o alias dentro da keystore
       - name: Verify Keystore Alias
-        run: |
-          keytool -list -v -keystore $HOME/keystore.jks -storepass ${{ secrets.MYAPP_KEYSTORE_PASSWORD }}
+        run: keytool -list -v -keystore $HOME/keystore.jks -storepass ${{ secrets.MYAPP_KEYSTORE_PASSWORD }}
 
-      # 🔹 Gera o AAB assinado
+      # 🔹 Gera o AAB assinado (⚠️ tudo em UMA linha só)
       - name: Assemble Release AAB
-        run: |
-            ./gradlew bundleRelease \
-              -PMYAPP_KEYSTORE=$HOME/keystore.jks \
-              -PMYAPP_KEYSTORE_PASSWORD=${{ secrets.MYAPP_KEYSTORE_PASSWORD }} \
-              -PMYAPP_KEY_ALIAS=${{ secrets.MYAPP_KEY_ALIAS }} \
-              -PMYAPP_KEY_PASSWORD=${{ secrets.MYAPP_KEY_PASSWORD }}}
+        run: ./gradlew bundleRelease -PMYAPP_KEYSTORE=$HOME/keystore.jks -PMYAPP_KEYSTORE_PASSWORD=${{ secrets.MYAPP_KEYSTORE_PASSWORD }} -PMYAPP_KEY_ALIAS=${{ secrets.MYAPP_KEY_ALIAS }} -PMYAPP_KEY_PASSWORD=${{ secrets.MYAPP_KEY_PASSWORD }}
 
       # ✅ Verifica se o AAB está assinado
       - name: Verify AAB signature
