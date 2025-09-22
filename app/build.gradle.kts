@@ -22,7 +22,7 @@ android {
 
     signingConfigs {
         create("release") {
-            // O caminho do keystore sempre vem da pipeline (Decode Keystore no YAML)
+            // Caminho do keystore: sempre vem do pipeline (ou variável local)
             val keystorePath = project.findProperty("MYAPP_KEYSTORE") as String?
                 ?: System.getenv("MYAPP_KEYSTORE")
 
@@ -48,7 +48,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // 🔑 Garante que o release use esta assinatura
+            // 🔑 Garante que o release sempre use a assinatura configurada acima
             signingConfig = signingConfigs.getByName("release")
         }
     }
