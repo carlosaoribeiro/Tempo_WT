@@ -13,8 +13,8 @@ android {
         applicationId = "com.carlosribeiro.tempo_wt"
         minSdk = 24
         targetSdk = 35
-        versionCode = 7
-        versionName = "1.2.2"
+        versionCode = 8
+        versionName = "1.2.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "WEATHER_API_KEY", "\"bb6ecc2665b7996900f60174b6731200\"")
