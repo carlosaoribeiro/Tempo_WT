@@ -22,3 +22,5 @@ local.properties
 *.keystore
 *.jks
 *.jks.base64
+tempowt-*.json
+tempowt-*.json
