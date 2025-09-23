@@ -47,30 +47,30 @@ jobs:
         shell: bash
         run: echo "${{ secrets.MYAPP_KEYSTORE_BASE64 }}" | base64 --decode > /home/runner/keystore.jks
 
-      # 👀 Sanidade: checa se o arquivo existe e tem tamanho razoável
+      # 👀 Confirma se o arquivo existe
       - name: Check keystore file
         run: |
-          test -s /home/runner/keystore.jks || (echo "Keystore vazio!" && exit 1)
+          test -s /home/runner/keystore.jks || (echo "❌ Keystore vazio!" && exit 1)
           ls -lh /home/runner/keystore.jks
 
-      # 🔍 Lista aliases dentro do keystore (confirma se bate com o secret)
+      # 🔍 Lista alias dentro do keystore
       - name: Verify Keystore Alias
         run: |
-          keytool -list -keystore /home/runner/keystore.jks -storepass "${{ secrets.MYAPP_KEYSTORE_PASSWORD }}"
-          echo "Esperado alias: ${{ secrets.MYAPP_KEY_ALIAS }}"
+          keytool -list -keystore /home/runner/keystore.jks -storepass "${{ secrets.MYAPP_KEYSTORE_PASSWORD }}" || true
+          echo "✅ Esperado alias: ${{ secrets.MYAPP_KEY_ALIAS }}"
 
-      # 🧹 Evita reaproveitar .aab antigo
+      # 🧹 Evita reaproveitar build antigo
       - name: Clean before release
         run: ./gradlew clean
 
-      # 📦 Gera AAB de release JÁ assinado
+      # 📦 Gera AAB assinado
       - name: Assemble Release AAB
         run: |
           ./gradlew bundleRelease \
-            -PMYAPP_KEYSTORE=/home/runner/keystore.jks \
-            -PMYAPP_KEYSTORE_PASSWORD="${{ secrets.MYAPP_KEYSTORE_PASSWORD }}" \
-            -PMYAPP_KEY_ALIAS="${{ secrets.MYAPP_KEY_ALIAS }}" \
-            -PMYAPP_KEY_PASSWORD="${{ secrets.MYAPP_KEY_PASSWORD }}"
+            "-PMYAPP_KEYSTORE=/home/runner/keystore.jks" \
+            "-PMYAPP_KEYSTORE_PASSWORD=${{ secrets.MYAPP_KEYSTORE_PASSWORD }}" \
+            "-PMYAPP_KEY_ALIAS=${{ secrets.MYAPP_KEY_ALIAS }}" \
+            "-PMYAPP_KEY_PASSWORD=${{ secrets.MYAPP_KEY_PASSWORD }}"
 
       - name: Upload Release AAB
         uses: actions/upload-artifact@v4
@@ -78,7 +78,7 @@ jobs:
           name: app-release-aab
           path: app/build/outputs/bundle/release/app-release.aab
 
-      # (Opcional) ☁️ Publica no Google Play – internal track
+      # ☁️ Upload para Play Console (internal track)
       - name: Upload to Play (internal)
         if: ${{ github.ref == 'refs/heads/main' }}
         uses: r0adkll/upload-google-play@v1
